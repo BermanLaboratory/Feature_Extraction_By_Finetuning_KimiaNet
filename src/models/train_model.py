@@ -11,10 +11,12 @@ import json
 from torchinfo import summary
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning import loggers as pl_loggers
+from sklearn.model_selection import train_test_split
+from utils.utils import final_labels
 
 train_dir = '/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Images_Tiled'
 test_dir = './test'
-wandb_logger = WandbLogger(name='Adam-8-0.0001',project='pytorchlightning')
+wandb_logger = WandbLogger(name='Adam-8-0.0001-200_images-0.1-random_seed(66)-balanced',project='pytorchlightning')
 
 tb_logger = pl_loggers.TensorBoardLogger(save_dir="/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/lightning_logs/")
 labels_dict = dataset_labels('/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Data.csv')
@@ -37,13 +39,15 @@ data_transforms = {
 
 # dataset = Tumor_Samples(train_dir,data_transforms['train'], labels_dict)
 
-with open("/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/data/selected_180.json", 'r') as f:
+
+with open("/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/data/selected_180_with_new.json", 'r') as f:
     selected = json.load(f)
 dataset = Tumor_Samples_Selected(train_dir,data_transforms['train'], labels_dict,selected)
 
+final_labels_list = final_labels('/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/data/selected_180_with_new.json','/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Data.csv')
 validation_split = .1
 shuffle_dataset = True
-random_seed= 42
+random_seed= 66
 
 # Creating data indices for training and validation splits:
 dataset_size = len(dataset)
@@ -54,6 +58,20 @@ if shuffle_dataset :
     np.random.seed(random_seed)
     np.random.shuffle(indices)
 train_indices, val_indices = indices[split:], indices[:split]
+
+
+#Testing sampling dataset with equal sets of each class
+
+
+train_indices, val_indices, _, _ = train_test_split(
+    indices,
+    final_labels_list,
+    stratify=final_labels_list,
+    test_size=0.1,
+    random_state=random_seed
+)
+
+
 
 # Creating PT data samplers and loaders:
 train_sampler = SubsetRandomSampler(train_indices)
@@ -70,6 +88,7 @@ trainer = pl.Trainer(
 	check_val_every_n_epoch = 1,
 	logger = [wandb_logger,tb_logger],
 	default_root_dir="/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/lightning_logs/"
+	# accumulate_grad_batches=2
 )
 
 # trainer.tune(model)

@@ -41,8 +41,8 @@ class kimianet_modified(pl.LightningModule):
         self.model.features = nn.Sequential(self.model.features , nn.AdaptiveAvgPool2d(output_size= (1,1)))
         num_features = self.model.classifier.in_features
         self.model = fully_connected(self.model.features,num_features,2)
-        self.criterion = nn.CrossEntropyLoss()
-
+        self.criterion_train = nn.CrossEntropyLoss()
+        self.criterion_val = nn.CrossEntropyLoss()
         
         model_dict = self.model.state_dict()
         pretrained_dict = torch.load(kimianet_weights,map_location=torch.device('cpu'))
@@ -62,9 +62,9 @@ class kimianet_modified(pl.LightningModule):
         data,label = batch
         output_1,output_2 = self.forward(data)
 
-        loss = self.criterion(output_2,label)
+        loss = self.criterion_train(output_2,label)
         self.train_accuracy(output_2,label)
-        self.log('train_loss',loss)
+        self.log('train_loss',loss,on_step = True,on_epoch = True)
         self.log('train_acc',self.train_accuracy,on_step = True,on_epoch = True,prog_bar = True)
 
         return {'loss':loss,'log':self.log}
@@ -79,10 +79,10 @@ class kimianet_modified(pl.LightningModule):
         val_data,val_label = batch
         temp,val_output = self.forward(val_data)
 
-        val_loss = nn.CrossEntropyLoss()(val_output,val_label)
+        val_loss = self.criterion_val(val_output,val_label)
         self.val_accuracy(val_output,val_label)
         self.log('val_acc', self.val_accuracy,on_step = True,on_epoch = True,prog_bar = True)
-        self.log('val_loss', val_loss)
+        self.log('val_loss', val_loss,on_step = True,on_epoch = True)
 
     # def validation_epoch_end(self, outs):
     #     # log epoch metric
@@ -91,11 +91,11 @@ class kimianet_modified(pl.LightningModule):
 
     def train_dataloader(self):
         return torch.utils.data.DataLoader(self.dataset, batch_size=self.batch_size, 
-                                           sampler=self.sampler['train'],num_workers = 1)
+                                           sampler=self.sampler['train'],num_workers = 40)
 
     def val_dataloader(self):
         return torch.utils.data.DataLoader(self.dataset, batch_size=self.batch_size,
-                                                sampler=self.sampler['val'],num_workers = 1)
+                                                sampler=self.sampler['val'],num_workers = 40)
 
 
     def configure_optimizers(self):

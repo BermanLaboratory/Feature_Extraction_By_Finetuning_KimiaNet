@@ -4,8 +4,6 @@ import json
 
 def selected_patches(selected_csv_folder):
 
-    
-
     csv_files = glob(selected_csv_folder+'/*')
     selected = []
     for file in csv_files:
@@ -21,5 +19,5 @@ def selected_patches(selected_csv_folder):
 image_patches = glob('/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Images_Tiled'+'/**/*.png',recursive = True)
 selected = selected_patches('/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Nuclei_Ratio_180')
 image_patches = [patch for patch in image_patches if patch.split('/')[-1] in selected]
-with open("/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/data/selected_180.json", 'w') as f:
+with open("/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/data/selected_180_with_new.json", 'w') as f:
     json.dump(image_patches, f, indent=2) 

@@ -11,6 +11,8 @@ class Tumor_Samples_Selected(Dataset):
         Args: 
             data_path : path to input data
             transform : transformation function
+            selected_patches: list of selected_patches with their file paths
+            labels_dict : labels associated with each whole slide
         """
         self.data_path = data_path
         self.image_patches = selected_patches
@@ -23,6 +25,7 @@ class Tumor_Samples_Selected(Dataset):
         return len(self.image_patches)
     
     def __getitem__(self,index):
+
         image = Image.open(self.image_patches[index]).convert('RGB')
         patch_name = self.image_patches[index].split('/')[-1]
         image_name = self.image_patches[index].split('/')[-2]
@@ -33,6 +36,11 @@ class Tumor_Samples_Selected(Dataset):
         return image,label
 
 def selected_patches(selected_csv_folder):
+
+    '''
+        input: selected_csv_folder -> folder that contains csv files with data of patches from each whole slide image
+        ouput: Sorted And top 500 selected patches from each whole slide image.
+    '''
 
     csv_files = glob(selected_csv_folder+'/*')
     selected = []

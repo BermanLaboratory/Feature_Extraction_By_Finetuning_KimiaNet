@@ -9,13 +9,23 @@ from architechture.kimianet_modified  import kimianet_modified
 from glob import glob
 from data.dataloader_csv import *
 import json
+# from torchvision.models.feature_extraction import get_graph_node_names
+
+# from pytorch_grad_cam import  ScoreCAM
+# from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
+# from pytorch_grad_cam.utils.image import show_cam_on_image
+
+from PIL import Image
+from matplotlib import pyplot as plt
+import cv2
 
 #----> pytorch_lightning
-from torchinfo import summary
-from pytorch_lightning.loggers import WandbLogger
+# from torchinfo import summary
+# from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning import loggers as pl_loggers
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
+
 
 
 from sklearn.model_selection import train_test_split
@@ -32,7 +42,7 @@ from utils.utils import final_labels
 
 
 #----> load loggers
-wandb_logger = WandbLogger(name='Adam-16-0.0001-200_images-0.1-random_seed(66)-balanced',project='pytorchlightning')
+# wandb_logger = WandbLogger(name='Adam-16-0.0001-200_images-0.1-random_seed(66)-balanced',project='pytorchlightning')
 tb_logger = pl_loggers.TensorBoardLogger(save_dir="/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/lightning_logs/")
 labels_dict = dataset_labels('/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Data.csv')
 
@@ -43,7 +53,7 @@ selected_image_patches_json = '/mnt/largedrive0/katariap/feature_extraction/data
 data_csv = '/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Data.csv'
 logging_dir = '/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/lightning_logs/'
 pretrained_weights = '/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models/KimiaNetPyTorchWeights.pth'
-batch_size = 16
+batch_size = 8
 learning_rate = 0.0001
 validation_split = .1
 shuffle_dataset = True
@@ -110,45 +120,46 @@ model = kimianet_modified(pretrained_weights,batch_size,learning_rate,sampler,da
 
 #-----> Model Checkpoint
 model_weights_path = '/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models'
-callback_checkpoint = ModelCheckpoint(
-	monitor = 'val_loss',
-	dir_path=model_weights_path,
-	filename='feature_extraction-{epoch:02d}-{val_loss:0.4f}',
-	save_top_k = 1,
-	mode = 'min,',
-	save_weights_only = True,
-	verbose = True
-	)
+# callback_checkpoint = ModelCheckpoint(
+# 	monitor = 'val_loss',
+# 	dir_path=model_weights_path,
+# 	filename='feature_extraction-{epoch:02d}-{val_loss:0.4f}',
+# 	save_top_k = 1,
+# 	mode = 'min,',
+# 	save_weights_only = True,
+# 	verbose = True
+# 	)
 
 #----> Eary Stopping Callback
 
-early_stop_callback = EarlyStopping(
-	monitor = 'val_loss',
-	patience = ,
-	min_delta = 0.00,
-	verbose = True,
-	mode = 'min'
+# early_stop_callback = EarlyStopping(
+# 	monitor = 'val_loss',
+# 	patience = ,
+# 	min_delta = 0.00,
+# 	verbose = True,
+# 	mode = 'min'
 	
-)
-# checkinpoint only when training
-Mycallbacks = [callback_checkpoint,early_stop_callback]
-#----> Instantiate Trainer
+# )
+# # checkinpoint only when training
+# Mycallbacks = [callback_checkpoint,early_stop_callback]
+# #----> Instantiate Trainer
 
 trainer = pl.Trainer(
     accelerator = "gpu",
 	devices = [2],
     max_epochs = 10,
-    progress_bar_refresh_rate = 10,
 	check_val_every_n_epoch = 1,
-	logger = [wandb_logger,tb_logger],
+	logger = [tb_logger],
 	default_root_dir=logging_dir,
 	# accumulate_grad_batches=2
-	callbacks = Mycallbacks
+	# callbacks = Mycallbacks
 )
+
+trainer.fit(model)
 
 # trainer.tune(model)
 # trainer.validate(model,ckpt_path='/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/lightning_logs/version_6/checkpoints/epoch=3-step=45000.ckpt')
-trainer.fit(model)
+# trainer.fit(model)
 
 
 
@@ -159,3 +170,5 @@ trainer.fit(model)
 
 # script = model.to_torchscript()
 # torch.jit.save(script,'Model.pt')
+
+

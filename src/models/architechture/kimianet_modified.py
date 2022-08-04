@@ -56,6 +56,7 @@ class kimianet_modified(pl.LightningModule):
     def forward(self,inputs):
         output_1,output_2 = self.model(inputs)
         return output_1,output_2
+        # return output_1
 
     def training_step(self,batch,batch_idx):
 

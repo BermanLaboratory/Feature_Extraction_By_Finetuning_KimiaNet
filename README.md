@@ -1,7 +1,33 @@
-KimiaNet_Feature_Extractor
+Feature Extractor
 ==============================
 
-Feature Extraction Using Kimianet For Cancer Grade Prediction
+Finetuning DenseNet121 architechture using weights of the model provided by KimiaNet for extracting features From Whole Slide Image Patches relevant to Cancer Grades
+
+## Updates:
+
+## Pre-requisites:
+    * Linux
+    * 
+
+## Testing And Evaluation Script
+
+```shell
+
+python train_model -- 
+```
+
+Additional flags that can be passed :
+* `--still under development`
+
+## Running External Cohorts on This Code
+
+## Dataset Preparation Steps
+
+## Feature Visualization And Clustering
+
+## Trained Model Checkpoints
+
+## Examples
 
 Project Organization
 ------------
@@ -21,7 +47,7 @@ Project Organization
     │
     ├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
     │                         the creator's initials, and a short `-` delimited description, e.g.
-    │                         `1.0-jqp-initial-data-exploration`.
+    │                         `1.0-pk-initial-data-exploration`.
     │
     ├── references         <- Data dictionaries, manuals, and all other explanatory materials.
     │
@@ -41,16 +67,21 @@ Project Organization
     │   ├── features       <- Scripts to turn raw data into features for modeling
     │   │   └── build_features.py
     │   │
-    │   ├── models         <- Scripts to train models and then use trained models to make predictions
+    │   ├── models    <- Scripts to train models and then use trained models to make predictions
     │   │   ├── architechture
-    |   |    |-------- model architechture 
+    |   |   ├── model architechture
+    |   |   |     └──kimianet_modified.py   <- Pytorch Lightning module for the model
     │   │   ├── predict_model.py
     │   │   └── train_model.py
     │   │
     │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
     │       └── visualize.py
     │
-    └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
+    └── tox.ini            
 
 
 --------
+
+
+## Issues:
+- All issues reported on the forum of the repository

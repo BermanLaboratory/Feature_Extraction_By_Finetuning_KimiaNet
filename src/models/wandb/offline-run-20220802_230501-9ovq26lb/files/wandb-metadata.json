@@ -1,0 +1,24 @@
+{
+    "os": "Linux-5.4.0-121-generic-x86_64-with-glibc2.29",
+    "python": "3.8.10",
+    "heartbeatAt": "2022-08-02T23:05:04.243526",
+    "startedAt": "2022-08-02T23:05:01.780354",
+    "docker": null,
+    "gpu": "NVIDIA A100-PCIE-40GB",
+    "gpu_count": 3,
+    "cpu_count": 256,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "train_model.py",
+    "codePath": "src/models/train_model.py",
+    "git": {
+        "remote": "https://github.com/pranavkataria978/Feature_Extraction",
+        "commit": "30768f0b924bef59997fa05654449d1a1eb8fe17"
+    },
+    "email": "pranavkataria978@gmail.com",
+    "root": "/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor",
+    "host": "hrmc-drsimpson",
+    "username": "katariap",
+    "executable": "/mnt/largedrive0/katariap/feature_extraction/bin/python3"
+}

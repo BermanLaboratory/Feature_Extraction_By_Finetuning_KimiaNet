@@ -1,21 +1,12 @@
-#----> pytorch
-from torch.utils.data.sampler import SubsetRandomSampler
-
 #----> Locally Created utils and packages import
-from utils.utils import final_labels,data_transforms_dict
+from utils.utils import *
 from architechture.kimianet_modified  import kimianet_modified
-from data.dataloader import Tumor_Samples, dataset_labels
+# from data.dataloader import Tumor_Samples
 from data.dataloader_csv import *
 
 #----> Helper Libraries
-import numpy as np
-import pandas as pd
-from glob import glob
 import json
-from PIL import Image
-from matplotlib import pyplot as plt
-import cv2
-from sklearn.model_selection import train_test_split
+
 
 #----> pytorch_lightning
 import pytorch_lightning as pl
@@ -32,120 +23,96 @@ from torchinfo import summary
 
 '''Todo:
 1. Create A Common configuration file using yaml
+	File Created -> Test the File
+	Make parameters updatable using command line
 2. Create A Dataset Interface And transfer Dataset Configuration and loaders to that file
 3. Pytorch Profiler
 4. Environment Requirements File
 5. Create Utils files
+	Utils files created -> Shift functions to utils folder
 '''
 
 
 
-#----> load loggers
-wandb_logger = WandbLogger(name='Adam-16-0.0001-200_images-0.1-random_seed(66)-balanced',project='pytorchlightning')
-tb_logger = pl_loggers.TensorBoardLogger(save_dir="/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/lightning_logs/")
-labels_dict = dataset_labels('/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Data.csv')
+def main(cfg):
 
-#----> Data transforms and configuration
+	random_seed = cfg.General.seed
 
-train_dir = '/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Images_Tiled'
-selected_image_patches_json = '/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/data/selected_180_with_new.json'
-data_csv = '/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Data.csv'
-logging_dir = '/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/lightning_logs/'
-pretrained_weights = '/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models/KimiaNetPyTorchWeights.pth'
-batch_size = 8
-learning_rate = 0.0001
-validation_split = .1
-shuffle_dataset = True
-random_seed= 66
+	#----> load loggers
+	wandb_logger = WandbLogger(name='Adam-16-0.0001-200_images-0.1-random_seed(66)-balanced',project='pytorchlightning')
+	tb_logger = pl_loggers.TensorBoardLogger(save_dir=cfg.General.log_path)
+	labels_dict = dataset_labels(cfg.Data.label_dir)
 
-with open(selected_image_patches_json, 'r') as f:
-    selected = json.load(f)
+	#----> Dataset And Interface Intitialization
 
+	data_transforms = data_transforms_dict()
+	with open(cfg.Data.selected_patches_json, 'r') as f:
+		selected = json.load(f)
 
-data_transforms = data_transforms_dict()
-# Dataset Initialization
+	dataset = Tumor_Samples_Selected(cfg.Data.data_dir,data_transforms['train'], labels_dict,selected)
+	patch_labels_list = patch_labels(cfg.Data.selected_patches_json,cfg.Data.label_dir)
+	indices = list(range(len(dataset)))
 
-# dataset = Tumor_Samples(train_dir,data_transforms['train'], labels_dict)
-dataset = Tumor_Samples_Selected(train_dir,data_transforms['train'], labels_dict,selected)
-final_labels_list = final_labels(selected_image_patches_json,data_csv)
+	# Setting Up data Samplers
+	sampler = data_sampler_dict(cfg.Data.split_type,indices,random_seed,len(dataset),patch_labels_list,cfg.Data.validation_split,cfg.Data.data_shuffle)
 
-dataset_size = len(dataset)
-indices = list(range(dataset_size))
-# Creating data indices for training and validation splits:
+	#----> Model Initialization
 
-# Random Validation and Training Split
+	model = kimianet_modified(cfg.Model.pretrained_weights,cfg.train_dataloader.batch_size,cfg.Optimizer.lr,sampler,dataset)
 
-split = int(np.floor(validation_split * dataset_size))
-if shuffle_dataset:
-    np.random.seed(random_seed)
-    np.random.shuffle(indices)
-train_indices, val_indices = indices[split:], indices[:split]
+	# summary(model.model, input_size=(4, 3,1000,1000))
 
-#Testing Dataset Sampling with Equal distribution of classes
-
-train_indices, val_indices, _, _ = train_test_split(
-    indices,
-    final_labels_list,
-    stratify=final_labels_list,
-    test_size=validation_split,
-    random_state=random_seed
-)
-
-# Setting Up data Samplers
-train_sampler = SubsetRandomSampler(train_indices)
-valid_sampler = SubsetRandomSampler(val_indices)
-sampler = {'train':train_sampler,'val':valid_sampler}
-
-#----> Model Initialization
-
-model = kimianet_modified(pretrained_weights,batch_size,learning_rate,sampler,dataset)
-
-# summary(model.model, input_size=(4, 3,1000,1000))
-
-#-----> Model Checkpoint
-model_weights_path = '/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models'
-# callback_checkpoint = ModelCheckpoint(
-# 	monitor = 'val_loss',
-# 	dir_path=model_weights_path,
-# 	filename='feature_extraction-{epoch:02d}-{val_loss:0.4f}',
-# 	save_top_k = 1,
-# 	mode = 'min,',
-# 	save_weights_only = True,
-# 	verbose = True
-# 	)
-
-#----> Eary Stopping Callback
-
-# early_stop_callback = EarlyStopping(
-# 	monitor = 'val_loss',
-# 	patience = ,
-# 	min_delta = 0.00,
-# 	verbose = True,
-# 	mode = 'min'
+	#-----> Model Checkpoint
 	
-# )
-# # checkinpoint only when training
-# Mycallbacks = [callback_checkpoint,early_stop_callback]
-# #----> Instantiate Trainer
+	# callback_checkpoint = ModelCheckpoint(
+	# 	monitor = 'val_loss',
+	# 	dir_path=model_weights_path,
+	# 	filename='feature_extraction-{epoch:02d}-{val_loss:0.4f}',
+	# 	save_top_k = 1,
+	# 	mode = 'min,',
+	# 	save_weights_only = True,
+	# 	verbose = True
+	# 	)
 
-trainer = pl.Trainer(
-    accelerator = "gpu",
-	devices = [2],
-    max_epochs = 10,
-	check_val_every_n_epoch = 1,
-	logger = [tb_logger],
-	default_root_dir=logging_dir,
-	# accumulate_grad_batches=2
-	# callbacks = Mycallbacks
-)
+	#----> Eary Stopping Callback
 
-trainer.fit(model)
-
-# trainer.tune(model)
-# trainer.validate(model,ckpt_path='/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/lightning_logs/version_6/checkpoints/epoch=3-step=45000.ckpt')
-# trainer.fit(model)
+	# early_stop_callback = EarlyStopping(
+	# 	monitor = 'val_loss',
+	# 	patience = ,
+	# 	min_delta = 0.00,
+	# 	verbose = True,
+	# 	mode = 'min'
+		
+	# )
+	# # checkinpoint only when training
+	# Mycallbacks = [callback_checkpoint,early_stop_callback]
 
 
+	#----> Instantiate Trainer
+
+	trainer = pl.Trainer(
+		accelerator = "gpu",
+		devices = cfg.General.gpus,
+		max_epochs = cfg.General.epochs,
+		check_val_every_n_epoch = 1,
+		logger = [tb_logger,wandb_logger],
+		# accumulate_grad_batches=2
+		# callbacks = Mycallbacks
+	)
+
+	trainer.fit(model)
+
+	# trainer.tune(model)
+	# trainer.validate(model,ckpt_path='/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/lightning_logs/version_6/checkpoints/epoch=3-step=45000.ckpt')
+	# trainer.fit(model)
+
+
+if __name__ == '__main__':
+
+	config_file_path = '/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/config/bermanlab.yaml'
+	cfg = read_yaml(config_file_path)
+
+	main(cfg)
 
 """
 	Load from Best Checkpoint And save models to load in any environment

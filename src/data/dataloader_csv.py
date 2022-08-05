@@ -35,24 +35,6 @@ class Tumor_Samples_Selected(Dataset):
 
         return image,label
 
-def selected_patches(selected_csv_folder):
-
-    '''
-        input: selected_csv_folder -> folder that contains csv files with data of patches from each whole slide image
-        ouput: Sorted And top 500 selected patches from each whole slide image.
-    '''
-
-    csv_files = glob(selected_csv_folder+'/*')
-    selected = []
-    for file in csv_files:
-
-        nuclei_ratio = pd.read_csv(file)
-        nuclei_ratio = nuclei_ratio.sort_values(by = 'Nuclei Ratio',ascending = False)
-        nuclei_ratio = nuclei_ratio.head(500)
-        selected_patches = nuclei_ratio['Patch'].to_list()
-        selected = selected + selected_patches
-    
-    return selected
 
 
 

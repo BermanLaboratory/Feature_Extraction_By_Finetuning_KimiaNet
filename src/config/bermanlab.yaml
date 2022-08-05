@@ -1,22 +1,22 @@
 General:
     seed: 2021
-    gpus: [0]
+    gpus: [2]
     epochs: 20
     grad_acc: 2
     patience: 10
     server: test #train #test
-    log_path: logs/
+    log_path: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/logs/
     checkpoints: 
-
+    run_name:
 Data:
     dataset_name: berman_lab_cohort
     data_shuffle: True
-    data_dir: 
+    data_dir: /mnt/largedrive0/katariap/feature_extraction/data/Dataset/Images_Tiled
     label_dir: /mnt/largedrive0/katariap/feature_extraction/data/Dataset/Data.csv
     selected_patches_json: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/data/selected_180_with_new.json
-    validation_split: 10
-    test_split: 10
-
+    validation_split: 0.1
+    test_split: 0.1
+    split_type: random #balanced
 
     train_dataloader:
         batch_size: 1 
@@ -34,6 +34,7 @@ Model:
     name: Kimianet_modified
     pretrained_weights: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models/KimiaNetPyTorchWeights.pth
     n_classes: 2
+    fine_tuned_weights_dir: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models
 
 
 Optimizer:

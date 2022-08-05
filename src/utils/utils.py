@@ -1,5 +1,6 @@
 import json
 from data.dataloader import dataset_labels
+from torchvision import transforms
 
 def final_labels(selected_json_file_path,data_csv_file_path):
 
@@ -17,3 +18,32 @@ def final_labels(selected_json_file_path,data_csv_file_path):
 
 
     return labels
+
+def data_transforms_dict():
+
+    data_transforms_dict = {
+	'train': transforms.Compose([
+        # transforms.Resize(1000),
+		transforms.RandomHorizontalFlip(),
+		transforms.ToTensor(),
+		# transforms.Lambda(stain_normalization),
+		transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+		
+	]),
+	'val': transforms.Compose([
+        # transforms.Resize(1000),
+		transforms.ToTensor(),
+		transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+	]),
+
+    'val': transforms.Compose([
+        # transforms.Resize(1000),
+		transforms.ToTensor(),
+		transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+	])
+    }
+
+    return data_transforms_dict
+
+
+

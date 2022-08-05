@@ -1,35 +1,34 @@
-from fileinput import filename
-from data.dataloader import Tumor_Samples, dataset_labels
-from torchvision import transforms
+#----> pytorch
 from torch.utils.data.sampler import SubsetRandomSampler
-import numpy as np
-import pytorch_lightning as pl
-import pandas as pd
+
+#----> Locally Created utils and packages import
+from utils.utils import final_labels,data_transforms_dict
 from architechture.kimianet_modified  import kimianet_modified
-from glob import glob
+from data.dataloader import Tumor_Samples, dataset_labels
 from data.dataloader_csv import *
+
+#----> Helper Libraries
+import numpy as np
+import pandas as pd
+from glob import glob
 import json
-# from torchvision.models.feature_extraction import get_graph_node_names
-
-# from pytorch_grad_cam import  ScoreCAM
-# from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
-# from pytorch_grad_cam.utils.image import show_cam_on_image
-
 from PIL import Image
 from matplotlib import pyplot as plt
 import cv2
+from sklearn.model_selection import train_test_split
 
 #----> pytorch_lightning
-# from torchinfo import summary
-# from pytorch_lightning.loggers import WandbLogger
+import pytorch_lightning as pl
+from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning import loggers as pl_loggers
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 
 
+#----> torchinfo to find structure of model
+from torchinfo import summary
 
-from sklearn.model_selection import train_test_split
-from utils.utils import final_labels
+
 
 '''Todo:
 1. Create A Common configuration file using yaml
@@ -38,11 +37,11 @@ from utils.utils import final_labels
 4. Environment Requirements File
 5. Create Utils files
 '''
-# print(torch.cuda.memory_summary(device=[2], abbreviated=False))
+
 
 
 #----> load loggers
-# wandb_logger = WandbLogger(name='Adam-16-0.0001-200_images-0.1-random_seed(66)-balanced',project='pytorchlightning')
+wandb_logger = WandbLogger(name='Adam-16-0.0001-200_images-0.1-random_seed(66)-balanced',project='pytorchlightning')
 tb_logger = pl_loggers.TensorBoardLogger(save_dir="/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/lightning_logs/")
 labels_dict = dataset_labels('/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Data.csv')
 
@@ -63,22 +62,7 @@ with open(selected_image_patches_json, 'r') as f:
     selected = json.load(f)
 
 
-data_transforms = {
-	'train': transforms.Compose([
-        # transforms.Resize(1000),
-		transforms.RandomHorizontalFlip(),
-		transforms.ToTensor(),
-		# transforms.Lambda(stain_normalization),
-		transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-		
-	]),
-	'val': transforms.Compose([
-        # transforms.Resize(1000),
-		transforms.ToTensor(),
-		transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-	]),
-}
-
+data_transforms = data_transforms_dict()
 # Dataset Initialization
 
 # dataset = Tumor_Samples(train_dir,data_transforms['train'], labels_dict)

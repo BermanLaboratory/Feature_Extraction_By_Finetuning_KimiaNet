@@ -61,6 +61,10 @@ Project Organization
     ├── src                <- Source code for use in this project.
     │   ├── __init__.py    <- Makes src a Python module
     │   │
+    |   |
+    |   ├── config
+    |   |    └──bermanlab.yaml  <- configurations for training and testing the model
+    |   |
     │   ├── data           <- Scripts to transform data , dataloaders , dataset classes
     │   │   └── make_dataset.py
     │   │

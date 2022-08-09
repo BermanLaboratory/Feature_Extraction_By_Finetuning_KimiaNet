@@ -65,11 +65,11 @@ class kimianet_modified(pl.LightningModule):
 
         loss = self.criterion_train(output_2,label)
         self.train_accuracy(output_2,label)
-        # self.log('train_loss',loss,on_step = True,on_epoch = True)
-        # self.log('train_acc',self.train_accuracy,on_step = True,on_epoch = True,prog_bar = True)
+        self.log('train_loss',loss,on_step = True,on_epoch = True)
+        self.log('train_acc',self.train_accuracy,on_step = True,on_epoch = True,prog_bar = True)
 
-        # return {'loss':loss,'log':self.log}
-        return{'loss':loss}
+        return {'loss':loss,'log':self.log}
+        # return{'loss':loss}
 
     # def training_epoch_end(self,outs):
 
@@ -83,8 +83,8 @@ class kimianet_modified(pl.LightningModule):
 
         val_loss = self.criterion_val(val_output,val_label)
         self.val_accuracy(val_output,val_label)
-        # self.log('val_acc', self.val_accuracy,on_step = True,on_epoch = True,prog_bar = True)
-        # self.log('val_loss', val_loss,on_step = True,on_epoch = True)
+        self.log('val_acc', self.val_accuracy,on_step = True,on_epoch = True,prog_bar = True)
+        self.log('val_loss', val_loss,on_step = True,on_epoch = True)
 
     # def validation_epoch_end(self, outs):
     #     # log epoch metric
@@ -101,7 +101,7 @@ class kimianet_modified(pl.LightningModule):
 
 
     def configure_optimizers(self):
-        #optimizer = torch.optim.Adam(self.parameters(), lr=(self.learning_rate))
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-3)
+    
+        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.learning_rate)
         return optimizer
     

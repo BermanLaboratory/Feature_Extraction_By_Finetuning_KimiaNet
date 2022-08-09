@@ -1,10 +1,17 @@
-# local package
--e .
-
-# external requirements
-click
-Sphinx
-coverage
-awscli
-flake8
-python-dotenv>=0.5.1
+addict==2.4.0
+click==8.0.4
+matplotlib==3.5.2
+numpy==1.23.0
+pandas==1.4.3
+Pillow==9.2.0
+python-dotenv==0.20.0
+pytorch_lightning==1.6.4
+PyYAML==6.0
+scikit_image==0.19.3
+scikit_learn==1.1.2
+setuptools==44.0.0
+skimage==0.0
+torch==1.8.1+cu111
+torchinfo==1.7.0
+torchmetrics==0.9.2
+torchvision==0.9.1+cu111

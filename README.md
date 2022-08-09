@@ -11,13 +11,27 @@ Finetuning DenseNet121 architechture using weights of the model provided by Kimi
 
 ## Testing And Evaluation Script
 
+For training the model on custom dataset
 ```shell
 
-python train_model -- 
+python train --config CONFIG_FILE_PATH --mode train
+
+```
+
+For Testing the model of custom model using pretrained weights:
+
+```shell
+
+python train --config CONFIG_FILE_PATH --mode test
 ```
 
 Additional flags that can be passed :
-* `--still under development`
+* `--config`: configuration file path
+* `--mode` : train or test mode
+* `--gpus` : gpus to use (default : [2]). Use nvidia-smi to check for free gpus.
+* `--batch_size_train` : batch_size for training the model
+* `--batch_size_test`
+: batch_size for testing the model
 
 ## Running External Cohorts on This Code
 
@@ -33,12 +47,11 @@ Project Organization
 ------------
 
     ├── LICENSE
-    ├── Makefile           <- Makefile with commands like `make data` or `make train`
     ├── README.md          <- The top-level README for developers using this project.
     ├── data
-    │   ├── external       <- Data from third party sources.
-    │   ├── interim        <- Intermediate data that has been transformed.
-    │   ├── processed      <- The final, canonical data sets for modeling.
+    │   ├── final dataset  <- Tiles Selected as final dataset after Nuclei Ratio calculation and Removal of Artifact Tiles
+    │   ├── interim        <- Intermediate data that has been transformed. Empty Tiles Removed and Stain Normalization Done
+    │   ├── Tiled_Dataset  <- The final, canonical data sets for modeling.
     │   └── raw            <- The original, immutable data dump.
     │
     ├── docs               <- A default Sphinx project; see sphinx-doc.org for details
@@ -55,33 +68,33 @@ Project Organization
     │   └── figures        <- Generated graphics and figures to be used in reporting
     │
     ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-    │                         generated with `pip freeze > requirements.txt`
+    │                         generated with pipreqs
     │
     ├── setup.py           <- makes project pip installable (pip install -e .) so src can be imported
     ├── src                <- Source code for use in this project.
-    │   ├── __init__.py    <- Makes src a Python module
-    │   │
-    |   |
-    |   ├── config
-    |   |    └──bermanlab.yaml  <- configurations for training and testing the model
-    |   |
-    │   ├── data           <- Scripts to transform data , dataloaders , dataset classes
-    │   │   └── make_dataset.py
-    │   │
-    │   ├── features       <- Scripts to turn raw data into features for modeling
-    │   │   └── build_features.py
-    │   │
-    │   ├── models    <- Scripts to train models and then use trained models to make predictions
-    │   │   ├── architechture
-    |   |   ├── model architechture
-    |   |   |     └──kimianet_modified.py   <- Pytorch Lightning module for the model
-    │   │   ├── predict_model.py
-    │   │   └── train_model.py
-    │   │
-    │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
-    │       └── visualize.py
+    ├── __init__.py    <- Makes src a Python module
     │
-    └── tox.ini            
+    |
+    ├── config
+    |    └──bermanlab.yaml  <- configurations for training and testing the model
+    |
+    ├── data           <- Scripts to transform data , dataloaders , dataset classes
+    │   └── make_dataset.py
+    │
+    ├── features       <- Scripts to turn raw data into features for modeling
+    │   └── build_features.py
+    │
+    ├── models    <- Scripts to train models and then use trained models to make predictions
+    │   ├── architechture
+    |   ├── model architechture
+    |   |     └──kimianet_modified.py   <- Pytorch Lightning module for the model
+    │   ├── predict_model.py
+    │   └── train_model.py
+    │
+    └── visualization  <- Scripts to create Visual Dictionary Using Extracted Features After fine Tuning the Model
+       └── visualize.py
+
+             
 
 
 --------

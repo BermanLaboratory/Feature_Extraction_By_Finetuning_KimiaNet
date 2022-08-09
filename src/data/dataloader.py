@@ -30,16 +30,4 @@ class Tumor_Samples(Dataset):
 
         return image,label
 
-def dataset_labels(csv_file_path):
 
-    labels_df = pd.read_csv(csv_file_path)
-    labels_df = labels_df.dropna()
-    labels_df.astype(int)
-    labels_dict = {}
-    files_list = labels_df['Sample ID'].to_list()
-    grade = labels_df['Sample Grade'].to_list()
-
-    for i in range(len(files_list)):
-        labels_dict[int(files_list[i])] = int(grade[i])
-    
-    return labels_dict

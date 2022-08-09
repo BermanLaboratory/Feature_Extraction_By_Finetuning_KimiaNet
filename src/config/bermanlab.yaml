@@ -4,30 +4,32 @@ General:
     epochs: 20
     grad_acc: 2
     patience: 10
-    server: test #train #test
+    mode: test #train #test
     log_path: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/logs/
+    project_name:
     checkpoints: 
-    run_name:
+    run_name: 
+    grad_accumulation: 1
 Data:
     dataset_name: berman_lab_cohort
     data_shuffle: True
     data_dir: /mnt/largedrive0/katariap/feature_extraction/data/Dataset/Images_Tiled
     label_dir: /mnt/largedrive0/katariap/feature_extraction/data/Dataset/Data.csv
-    selected_patches_json: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/data/selected_180_with_new.json
+    selected_patches_json: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/data/selected_1000_180_with_new.json
     validation_split: 0.1
     test_split: 0.1
     split_type: random #balanced
 
     train_dataloader:
-        batch_size: 1 
+        batch_size: 8
         num_workers: 8  #how many cpus to use for loading data
 
     test_dataloader:
-        batch_size: 1
+        batch_size: 8
         num_workers: 8
 
     val_dataloader:
-        batch_size: 1
+        batch_size: 8
         num_workers: 8 
 
 Model:

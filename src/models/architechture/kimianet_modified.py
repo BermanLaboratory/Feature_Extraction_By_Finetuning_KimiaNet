@@ -24,7 +24,7 @@ class fully_connected(nn.Module):
 
 class kimianet_modified(pl.LightningModule):
 
-    def __init__(self,kimianet_weights,batch_size,learning_rate,sampler,dataset):
+    def __init__(self,kimianet_weights,batch_size,learning_rate,sampler,dataset,num_classes=2):
 
         super().__init__()
 
@@ -40,7 +40,7 @@ class kimianet_modified(pl.LightningModule):
         self.model = torchvision.models.densenet121(pretrained=True)
         self.model.features = nn.Sequential(self.model.features , nn.AdaptiveAvgPool2d(output_size= (1,1)))
         num_features = self.model.classifier.in_features
-        self.model = fully_connected(self.model.features,num_features,2)
+        self.model = fully_connected(self.model.features,num_features,num_classes)
         self.criterion_train = nn.CrossEntropyLoss()
         self.criterion_val = nn.CrossEntropyLoss()
         

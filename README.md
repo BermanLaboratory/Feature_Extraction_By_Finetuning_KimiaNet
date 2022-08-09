@@ -71,31 +71,30 @@ Project Organization
     │                         generated with pipreqs
     │
     ├── setup.py           <- makes project pip installable (pip install -e .) so src can be imported
-    ├── src                <- Source code for use in this project.
-    ├── __init__.py    <- Makes src a Python module
-    │
-    |
-    ├── config
-    |    └──bermanlab.yaml  <- configurations for training and testing the model
-    |
-    ├── data           <- Scripts to transform data , dataloaders , dataset classes
-    │   └── make_dataset.py
-    │
-    ├── features       <- Scripts to turn raw data into features for modeling
-    │   └── build_features.py
-    │
-    ├── models    <- Scripts to train models and then use trained models to make predictions
-    │   ├── architechture
-    |   ├── model architechture
-    |   |     └──kimianet_modified.py   <- Pytorch Lightning module for the model
-    │   ├── predict_model.py
-    │   └── train_model.py
-    │
-    └── visualization  <- Scripts to create Visual Dictionary Using Extracted Features After fine Tuning the Model
-       └── visualize.py
+    └── src                <- Source code for use in this project.
+        ├── __init__.py    <- Makes src a Python module
+        │
+        |
+        ├── config
+        |    └──bermanlab.yaml  <- configurations for training and testing the model
+        |
+        ├── data           <- Scripts to transform data , dataloaders , dataset classes
+        │   └── make_dataset.py
+        │
+        ├── features       <- Scripts to turn raw data into features for modeling
+        │   └── build_features.py
+        │
+        ├── models    <- Scripts to train models and then use trained models to make predictions
+        │   ├── architechture
+        |   ├── model architechture
+        |   |     └──kimianet_modified.py   <- Pytorch Lightning module for the model
+        │   ├── predict_model.py
+        │   └── train_model.py
+        │
+        └── visualization  <- Scripts to create Visual Dictionary Using Extracted Features After fine Tuning the Model
+               └── visualize.py
 
-             
-
+            
 
 --------
 

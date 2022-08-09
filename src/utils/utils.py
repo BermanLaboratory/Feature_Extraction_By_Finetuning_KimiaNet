@@ -2,7 +2,6 @@ import json
 import yaml
 import numpy as np
 from addict import Dict
-from data.dataloader import dataset_labels
 from torchvision import transforms
 from sklearn.model_selection import train_test_split
 #----> pytorch
@@ -48,8 +47,8 @@ def data_transforms_dict():
     data_transforms_dict = {
 	'train': transforms.Compose([
         # transforms.Resize(1000),
-		transforms.RandomHorizontalFlip(),
 		transforms.ToTensor(),
+        transforms.RandomHorizontalFlip(),
 		# transforms.Lambda(stain_normalization),
 		transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 		
@@ -133,3 +132,26 @@ def selected_patches(selected_csv_folder):
         selected = selected + selected_patches
     
     return selected
+
+
+def freeze_dense_blocks(block_list,model):
+
+    if(1 in block_list):
+        for param in model.model.model[0].denseblock1.parameters():
+            param.requires_grad = False
+	
+    if(2 in block_list):
+        for param in model.model.model[0].denseblock3.parameters():
+            param.requires_grad = False
+
+    if(3 in block_list):
+
+        for param in model.model.model[0].denseblock3.parameters():
+            param.requires_grad = False
+
+    if(4 in block_list):
+
+        for param in model.model.model[0].denseblock4.parameters():
+            param.requires_grad = False
+
+

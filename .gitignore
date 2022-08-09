@@ -92,4 +92,5 @@ src/wandb/
 src/lightning_logs/
 src/data/selected_180_with_new.json
 src/data/selected_180.json
+src/data/selected_1000_180_with_new.json
 src/logs/

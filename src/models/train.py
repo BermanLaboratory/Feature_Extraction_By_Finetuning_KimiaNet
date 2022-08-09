@@ -22,9 +22,9 @@ from torchinfo import summary
 
 
 '''Todo:
-4. Environment Requirements File
-5. Create Utils files
-	Utils files created -> Shift functions to utils folder
+1. Update Requirement file
+2. Shift Callbacks to different utils files
+3. Test the test Code.
 '''
 
 def parse():
@@ -62,10 +62,15 @@ def main(cfg):
 
 	#----> Model Initialization
 
-	model = kimianet_modified(cfg.Model.pretrained_weights,cfg.Data.train_dataloader.batch_size,cfg.Optimizer.lr,sampler,dataset)
+	model = kimianet_modified(cfg.Model.pretrained_weights,cfg.Data.train_dataloader.batch_size,cfg.Optimizer.lr,sampler,dataset,cfg.Model.n_classes)
 
 	# summary(model.model, input_size=(4, 3,1000,1000))
 
+
+	#-----> Selecting DenseBlocks to Train and Freeze
+
+	freeze_dense_blocks(cfg.Model.layers_to_freeze,model)
+	
 	#-----> Model Checkpoint
 	
 	callback_checkpoint = ModelCheckpoint(

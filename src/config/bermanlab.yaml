@@ -1,24 +1,25 @@
 General:
-    seed: 2021
+    seed: 2000
     gpus: [2]
-    epochs: 20
+    epochs: 15
     grad_acc: 2
     patience: 10
-    mode: test #train #test
+    mode: train #train #test
     log_path: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/logs/
-    project_name:
+    project_name: feature_extraction
     checkpoints: 
-    run_name: 
+    run_name: Testing Layer Freezing
     grad_accumulation: 1
 Data:
     dataset_name: berman_lab_cohort
     data_shuffle: True
     data_dir: /mnt/largedrive0/katariap/feature_extraction/data/Dataset/Images_Tiled
     label_dir: /mnt/largedrive0/katariap/feature_extraction/data/Dataset/Data.csv
-    selected_patches_json: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/data/selected_1000_180_with_new.json
+    selected_patches_json: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/data/selected_180_with_new.json
     validation_split: 0.1
     test_split: 0.1
-    split_type: random #balanced
+    split_type: balanced #balanced #random
+    target_stain: /mnt/largedrive0/katariap/feature_extraction/data/Dataset/Images_Tiled/Sample 197.vsi - 20x/Sample 197.vsi - 20x [x=24000,y=34000,w=1000,h=1000].png
 
     train_dataloader:
         batch_size: 8
@@ -37,7 +38,7 @@ Model:
     pretrained_weights: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models/KimiaNetPyTorchWeights.pth
     n_classes: 2
     fine_tuned_weights_dir: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models
-
+    layers_to_freeze: [] # [1,2,3,4]
 
 Optimizer:
     opt: adam

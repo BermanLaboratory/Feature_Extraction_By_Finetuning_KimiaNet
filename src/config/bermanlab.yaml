@@ -8,7 +8,7 @@ General:
     log_path: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/logs/
     project_name: feature_extraction
     checkpoints: 
-    run_name: Testing Layer Freezing
+    run_name: Testing WSI Data Interface
     grad_accumulation: 1
 Data:
     dataset_name: berman_lab_cohort
@@ -24,15 +24,15 @@ Data:
 
     train_dataloader:
         batch_size: 8
-        num_workers: 8  #how many cpus to use for loading data
+        num_workers: 40  #how many cpus to use for loading data
 
     test_dataloader:
         batch_size: 8
-        num_workers: 8
+        num_workers: 40
 
     val_dataloader:
         batch_size: 8
-        num_workers: 8 
+        num_workers: 40 
 
 Model:
     name: Kimianet_modified
@@ -43,7 +43,7 @@ Model:
 
 Optimizer:
     opt: adam
-    lr: 0.0001
+    lr: 0.001 # Check the Learning Rate Graph
     opt_eps: null 
     opt_betas: null
     momentum: null 

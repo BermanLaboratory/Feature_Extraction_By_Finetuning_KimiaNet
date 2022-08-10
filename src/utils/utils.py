@@ -49,6 +49,7 @@ def data_transforms_dict():
         # transforms.Resize(1000),
 		transforms.ToTensor(),
         transforms.RandomHorizontalFlip(),
+        transforms.RandomVerticalFlip(),
 		# transforms.Lambda(stain_normalization),
 		transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 		
@@ -59,7 +60,7 @@ def data_transforms_dict():
 		transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 	]),
 
-    'val': transforms.Compose([
+    'test': transforms.Compose([
         # transforms.Resize(1000),
 		transforms.ToTensor(),
 		transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])

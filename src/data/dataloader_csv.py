@@ -25,7 +25,6 @@ class Tumor_Samples_Selected(Dataset):
         self.labels_dict = labels_dict
 
 
-
     def __len__(self):
         
         return len(self.image_patches)
@@ -36,6 +35,7 @@ class Tumor_Samples_Selected(Dataset):
         # patch_name = self.image_patches[index].split('/')[-1]
         image_name = self.image_patches[index].split('/')[-2]
         label = self.labels_dict[int(((image_name).split(' ')[1]).split('.')[0])]
+
         image = self.transform(image)
         
         return image,label

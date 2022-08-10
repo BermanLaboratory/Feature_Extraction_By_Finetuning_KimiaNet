@@ -24,18 +24,16 @@ class fully_connected(nn.Module):
 
 class kimianet_modified(pl.LightningModule):
 
-    def __init__(self,kimianet_weights,batch_size,learning_rate,sampler,dataset,num_classes=2):
+    def __init__(self,kimianet_weights,learning_rate,num_classes=2):
 
         super().__init__()
 
         #Initialize the model here
 
-        self.batch_size = batch_size
+
         self.learning_rate = learning_rate #
         self.train_accuracy = torchmetrics.Accuracy() #
         self.val_accuracy = torchmetrics.Accuracy()
-        self.sampler = sampler
-        self.dataset = dataset
 
         self.model = torchvision.models.densenet121(pretrained=True)
         self.model.features = nn.Sequential(self.model.features , nn.AdaptiveAvgPool2d(output_size= (1,1)))
@@ -91,13 +89,6 @@ class kimianet_modified(pl.LightningModule):
     #     self.log('val_acc_epoch', self.accuracy.compute())
     #     print(self.accuracy.compute())
 
-    def train_dataloader(self):
-        return torch.utils.data.DataLoader(self.dataset, batch_size=self.batch_size, 
-                                           sampler=self.sampler['train'],num_workers = 40)
-
-    def val_dataloader(self):
-        return torch.utils.data.DataLoader(self.dataset, batch_size=self.batch_size,
-                                                sampler=self.sampler['val'],num_workers = 40)
 
 
     def configure_optimizers(self):

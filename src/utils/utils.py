@@ -88,28 +88,34 @@ def data_split_random(seed,indices,dataset_size,validation_split = 0.1,shuffle_d
 
 def data_split_balanced(seed,indices,labels_list,validation_split = 0.1):
 
-    train_indices, val_indices, _, _ = train_test_split(
-    indices,
-    labels_list,
-    stratify=labels_list,
-    test_size=validation_split,
-    random_state=seed
-    )
+    train_indices, val_indices, train_labels, val_labels = train_test_split(
+                                            indices,
+                                            labels_list,
+                                            stratify=labels_list,
+                                            test_size=validation_split,
+                                            random_state=seed
+                                            )
 
-    return train_indices,val_indices
+    return train_indices,val_indices,train_labels,val_labels
 
-def data_sampler_dict(split_type,indices,random_seed,len_dataset,patch_labels_list,validation_split=0.1,data_shuffle = False):
+def data_sampler_dict(split_type,indices,random_seed,len_dataset,patch_labels_list,train_split = 0.8 ,validation_split=0.1,test_split = 0.1,data_shuffle = True):
+
+    ratio_remaining = 1.0 - validation_split
+    print(ratio_remaining)
+    ratio_test_adjusted = test_split / ratio_remaining
 
 
     if split_type == 'random':
-        train_indices,val_indices = data_split_random(random_seed,indices,len_dataset,validation_split,data_shuffle)
+        train_indices_remaining,val_indices = data_split_random(random_seed,indices,len_dataset,validation_split,data_shuffle)
+        train_indices,test_indices = data_split_random(random_seed,train_indices_remaining,len(train_indices),ratio_test_adjusted,data_shuffle)
     else:
-        train_indices,val_indices = data_split_balanced(random_seed,indices,patch_labels_list,validation_split)
-
+        train_indices_remaining,val_indices,train_labels_remaining,val_labels = data_split_balanced(random_seed,indices,patch_labels_list,validation_split)
+        train_indices,test_indices,_,_ = data_split_balanced(random_seed,train_indices_remaining,train_labels_remaining,ratio_test_adjusted)
 
     train_sampler = SubsetRandomSampler(train_indices)
     valid_sampler = SubsetRandomSampler(val_indices)
-    sampler = {'train':train_sampler,'val':valid_sampler}
+    test_sampler = SubsetRandomSampler(test_indices)
+    sampler = {'train':train_sampler,'val':valid_sampler,'test':test_sampler}
 
     return sampler
 

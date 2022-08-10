@@ -1,0 +1,22 @@
+{
+    "os": "Linux-5.4.0-121-generic-x86_64-with-glibc2.29",
+    "python": "3.8.10",
+    "heartbeatAt": "2022-08-10T01:31:37.828987",
+    "startedAt": "2022-08-10T01:31:37.787157",
+    "docker": null,
+    "cpu_count": 256,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "train.py",
+    "codePath": "src/models/train.py",
+    "git": {
+        "remote": "https://github.com/BermanLaboratory/Feature_Extraction_By_Finetuning_KimiaNet.git",
+        "commit": "56ab6cb9e4817b88f0c32fe8bdca8e63abf4c4d6"
+    },
+    "email": "pranavkataria978@gmail.com",
+    "root": "/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor",
+    "host": "hrmc-drsimpson",
+    "username": "katariap",
+    "executable": "/mnt/largedrive0/katariap/feature_extraction/bin/python"
+}

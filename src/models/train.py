@@ -25,6 +25,18 @@ from torchinfo import summary
 1. Update Requirement file
 2. Shift Callbacks to different utils files
 3. Test the test Code.
+4. Add Preprocessing Code to the repository
+5. Feature Visualisation Code
+6. Feature Importance Code
+7. Extracting the heatmaps for each feature.
+8. Construction of ROC Curves for prediction
+9. Silhoutte Algorithm
+10. Clustering for patch selection
+11. Train Val And Test separation
+12.Gini Index Calculation Using Extracted Features
+13. Mean and Standard deviation of dataset: For Reinhard Normalization
+14. Add seaborn visualization code here
+15. Add Statistics Calculation to the code
 '''
 
 def parse():
@@ -58,7 +70,7 @@ def main(cfg):
 	indices = list(range(len(dataset)))
 
 	# Setting Up data Samplers
-	sampler = data_sampler_dict(cfg.Data.split_type,indices,random_seed,len(dataset),patch_labels_list,cfg.Data.validation_split,cfg.Data.data_shuffle)
+	sampler = data_sampler_dict(cfg.Data.split_type,indices,random_seed,len(dataset),patch_labels_list,cfg.Data.train_slit,cfg.Data.validation_split,cfg.Data.test_split,cfg.Data.data_shuffle)
 
 	#----> Model Initialization
 

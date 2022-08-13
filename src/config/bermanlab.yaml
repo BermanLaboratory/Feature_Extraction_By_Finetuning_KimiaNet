@@ -1,21 +1,20 @@
 General:
-    seed: 2000
+    seed: 65
     gpus: [2]
     epochs: 15
-    grad_acc: 2
     patience: 10
     mode: train #train #test
     log_path: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/logs/
     project_name: feature_extraction
     checkpoints: 
-    run_name: Testing WSI Data Interface
+    run_name: 500-Adam-0.0001-8-stain_norm
     grad_accumulation: 1
 Data:
     dataset_name: berman_lab_cohort
     data_shuffle: True
     data_dir: /mnt/largedrive0/katariap/feature_extraction/data/Dataset/Images_Tiled
     label_dir: /mnt/largedrive0/katariap/feature_extraction/data/Dataset/Data.csv
-    selected_patches_json: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/data/selected_180_with_new.json
+    selected_patches_json: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/data/selected_clustering_500.json
     train_split: 0.8
     validation_split: 0.1
     test_split: 0.1
@@ -24,18 +23,18 @@ Data:
 
     train_dataloader:
         batch_size: 8
-        num_workers: 40  #how many cpus to use for loading data
+        num_workers: 200  #how many cpus to use for loading data
 
     test_dataloader:
         batch_size: 8
-        num_workers: 40
+        num_workers: 200
 
     val_dataloader:
         batch_size: 8
-        num_workers: 40 
+        num_workers: 200
 
 Model:
-    name: Kimianet_modified
+    name: model_interface
     pretrained_weights: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models/KimiaNetPyTorchWeights.pth
     n_classes: 2
     fine_tuned_weights_dir: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models
@@ -43,11 +42,11 @@ Model:
 
 Optimizer:
     opt: adam
-    lr: 0.001 # Check the Learning Rate Graph
+    lr: 0.0001 # Check the Learning Rate Graph
     opt_eps: null 
     opt_betas: null
     momentum: null 
-    weight_decay: 0.00001
+    weight_decay: 0.0001
 
 Loss:
     loss : CrossEntropyLoss

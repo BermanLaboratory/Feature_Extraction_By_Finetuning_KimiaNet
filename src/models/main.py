@@ -1,8 +1,8 @@
 #----> Locally Created utils and packages import
 from data.data_interface import WSI_Data_Interface
 from utils.utils import *
-from architechture.kimianet_modified  import kimianet_modified
-# from data.dataloader import Tumor_Samples
+from architechture.model_interface  import model_interface
+# from data.dataloader import Tiles_Selected
 from data.dataloader_csv import *
 #----> Helper Libraries
 import json
@@ -24,7 +24,7 @@ from torchinfo import summary
 '''Todo:
 1. Update Requirement file
 2. Shift Callbacks to different utils files
-3. Test the test Code.
+3. Test the -> test Code.
 4. Add Preprocessing Code to the repository
 5. Feature Visualisation Code
 6. Feature Importance Code:
@@ -33,8 +33,10 @@ from torchinfo import summary
 8. Construction of ROC Curves for prediction
 9. Silhoutte Algorithm
 10. Clustering for patch selection
-12.Gini Index Calculation Using Extracted Features
+12. Gini Index Calculation Using Extracted Features
 13. Mean and Standard deviation of dataset: For Reinhard Normalization
+		Added in the Dataloader
+		Using Mean and Standard dev already given
 14. Add seaborn visualization code here
 15. Add Statistics Calculation to the code
 16. Learning Rate and Batch Size Optimizer
@@ -46,8 +48,8 @@ def parse():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--mode',default = 'train',type = str)
 	parser.add_argument('--config',default = '',type = str)
-	parser.add_argument('--batch_size_train',default = 8)
-	parser.add_argument('--batch_size_test',default = 8 )
+	# parser.add_argument('--batch_size_train',default = 8)
+	# parser.add_argument('--batch_size_test',default = 8 )
 	parser.add_argument('--gpus',default = [2])
 	args = parser.parse_args()
 	return args
@@ -68,7 +70,7 @@ def main(cfg):
 
 	#----> Model Initialization
 
-	model = kimianet_modified(cfg.Model.pretrained_weights,cfg.Model.n_classes)
+	model = model_interface(cfg.Model.pretrained_weights,cfg.Model.n_classes)
 
 	# summary(model.model, input_size=(4, 3,1000,1000))
 
@@ -118,18 +120,18 @@ def main(cfg):
 	)
 
 
-	lr_finder = trainer.tuner.lr_find(model,datamodule=data_module)
+	# lr_finder = trainer.tuner.lr_find(model,datamodule=data_module)
 
-	# Results can be found in
-	lr_finder.results
+	# # Results can be found in
+	# lr_finder.results
 
-	# Plot with
-	fig = lr_finder.plot(suggest=True)
-	fig.savefig('/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/models/Learning_Rate.png')
+	# # Plot with
+	# fig = lr_finder.plot(suggest=True)
+	# fig.savefig('/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/models/Learning_Rate.png')
 
-	# Pick point based on plot, or get suggestion
-	new_lr = lr_finder.suggestion()
-	print(new_lr)
+	# # Pick point based on plot, or get suggestion
+	# new_lr = lr_finder.suggestion()
+	# print(new_lr)
 
 
 	if cfg.General.mode == 'train':
@@ -161,8 +163,8 @@ if __name__ == '__main__':
 
 	cfg.General.gpus = args.gpus
 	cfg.General.mode = args.mode
-	cfg.Data.test_dataloader.batch_size = args.batch_size_test
-	cfg.Data.train_dataloader.batch_size = args.batch_size_train
+	# cfg.Data.test_dataloader.batch_size = args.batch_size_test
+	# cfg.Data.train_dataloader.batch_size = args.batch_size_train
 	
 
 	main(cfg)

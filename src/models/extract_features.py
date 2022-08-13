@@ -18,7 +18,7 @@ from skimage import io, transform
 import torch.nn.functional as F
 from PIL import Image
 import pickle	
-from models.architechture.kimianet_modified import kimianet_modified
+from models.architechture.model_interface import model_interface
 import json
 from data.dataloader import dataset_labels
 from torch.utils.data.sampler import SubsetRandomSampler
@@ -31,7 +31,7 @@ train_dir = '/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Images_Ti
 labels_dict = dataset_labels('/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Data.csv')
 data_transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
 
-class Tumor_Samples_Selected(Dataset):
+class Tiles_Selected_CSV(Dataset):
 
     def __init__(self,data_path,transform,labels_dict,selected_patches):
         """
@@ -61,7 +61,7 @@ class Tumor_Samples_Selected(Dataset):
 
 with open("/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/data/selected_180_with_new.json", 'r') as f:
         selected = json.load(f)
-dataset = Tumor_Samples_Selected(train_dir,data_transform, labels_dict,selected)
+dataset = Tiles_Selected_CSV(train_dir,data_transform, labels_dict,selected)
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=16, num_workers = 40)
 
 validation_split = .2
@@ -110,7 +110,7 @@ def extract_features(model):
 
 
 weights = '/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models/KimiaNetPyTorchWeights.pth'
-model = kimianet_modified.load_from_checkpoint('/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/lightning_logs/pytorchlightning_lightning_logs/2mndwf27_4/checkpoints/epoch=19-step=56260.ckpt',sampler=sampler,dataset=dataset,kimianet_weights = weights,learning_rate = 0.0001,batch_size = 8)
+model = model_interface.load_from_checkpoint('/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/lightning_logs/pytorchlightning_lightning_logs/2mndwf27_4/checkpoints/epoch=19-step=56260.ckpt',sampler=sampler,dataset=dataset,kimianet_weights = weights,learning_rate = 0.0001,batch_size = 8)
 model = model.to(device)
 print(model.learning_rate)
 

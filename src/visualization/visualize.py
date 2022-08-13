@@ -1,13 +1,13 @@
 from pytorch_grad_cam import GradCAM, ScoreCAM, GradCAMPlusPlus, AblationCAM, XGradCAM, EigenCAM, FullGrad
 from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
 from pytorch_grad_cam.utils.image import show_cam_on_image
-from models.architechture.kimianet_modified import kimianet_modified
+from models.architechture.model_interface import model_interface
 from PIL import Image
 from torchvision import transforms
 import numpy as np
-from data.dataloader import Tumor_Samples, dataset_labels
+from data.dataloader import Tiles_Selected, dataset_labels
 from torch.utils.data.sampler import SubsetRandomSampler
-from data.dataloader_csv import *
+from data.tiles_dataset import *
 import json
 train_dir = '/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Images_Tiled'
 test_dir = './test' 
@@ -30,7 +30,7 @@ data_transforms = {
 }
 with open("/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/data/selected_180.json", 'r') as f:
     selected = json.load(f)
-dataset = Tumor_Samples_Selected(train_dir,data_transforms['train'], labels_dict,selected)
+dataset = Tiles_Selected_Selected(train_dir,data_transforms['train'], labels_dict,selected)
 
 validation_split = .1
 shuffle_dataset = True
@@ -56,7 +56,7 @@ image = Image.open('/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Im
 args = ['/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models/KimiaNetPyTorchWeights.pth',4,0.0001,sampler,dataset]
 weights_file = '/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models/KimiaNetPyTorchWeights.pth'
 
-model = kimianet_modified.load_from_checkpoint("/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/lightning_logs/version_6/checkpoints/epoch=3-step=45000.ckpt",kimianet_weights=weights_file,batch_size=4,learning_rate=0.001,sampler=sampler,dataset=dataset)
+model = model_interface.load_from_checkpoint("/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/lightning_logs/version_6/checkpoints/epoch=3-step=45000.ckpt",kimianet_weights=weights_file,batch_size=4,learning_rate=0.001,sampler=sampler,dataset=dataset)
 image = data_transforms['val'](image)
 model.eval()
 # target_layers = [model.model.features[1]]

@@ -102,13 +102,13 @@ def data_split_balanced(seed,indices,labels_list,validation_split = 0.1):
 def data_sampler_dict(split_type,indices,random_seed,len_dataset,patch_labels_list,train_split = 0.8 ,validation_split=0.1,test_split = 0.1,data_shuffle = True):
 
     ratio_remaining = 1.0 - validation_split
-    print(ratio_remaining)
     ratio_test_adjusted = test_split / ratio_remaining
 
 
     if split_type == 'random':
         train_indices_remaining,val_indices = data_split_random(random_seed,indices,len_dataset,validation_split,data_shuffle)
-        train_indices,test_indices = data_split_random(random_seed,train_indices_remaining,len(train_indices),ratio_test_adjusted,data_shuffle)
+        train_indices,test_indices = data_split_random(random_seed,train_indices_remaining,len(train_indices_remaining),ratio_test_adjusted,data_shuffle)
+        
     else:
         train_indices_remaining,val_indices,train_labels_remaining,val_labels = data_split_balanced(random_seed,indices,patch_labels_list,validation_split)
         train_indices,test_indices,_,_ = data_split_balanced(random_seed,train_indices_remaining,train_labels_remaining,ratio_test_adjusted)
@@ -120,25 +120,6 @@ def data_sampler_dict(split_type,indices,random_seed,len_dataset,patch_labels_li
 
     return sampler
 
-
-def selected_patches(selected_csv_folder):
-
-    '''
-        input: selected_csv_folder -> folder that contains csv files with data of patches from each whole slide image
-        ouput: Sorted And top 500 selected patches from each whole slide image.
-    '''
-
-    csv_files = glob(selected_csv_folder+'/*')
-    selected = []
-    for file in csv_files:
-
-        nuclei_ratio = pd.read_csv(file)
-        nuclei_ratio = nuclei_ratio.sort_values(by = 'Nuclei Ratio',ascending = False)
-        nuclei_ratio = nuclei_ratio.head(500)
-        selected_patches = nuclei_ratio['Patch'].to_list()
-        selected = selected + selected_patches
-    
-    return selected
 
 
 def freeze_dense_blocks(block_list,model):

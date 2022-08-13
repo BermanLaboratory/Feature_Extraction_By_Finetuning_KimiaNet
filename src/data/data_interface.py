@@ -1,7 +1,7 @@
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 from utils.utils import *
-from data.dataloader_csv import *
+from data.tiles_dataset import *
 
 
 class WSI_Data_Interface(pl.LightningDataModule):
@@ -24,9 +24,9 @@ class WSI_Data_Interface(pl.LightningDataModule):
         with open(self.cfg.selected_patches_json, 'r') as f:
             self.selected = json.load(f)
 
-        self.dataset_train = Tumor_Samples_Selected(self.cfg.data_dir,self.data_transforms['train'], labels_dict,self.selected)
-        self.dataset_val = Tumor_Samples_Selected(self.cfg.data_dir,self.data_transforms['val'], labels_dict,self.selected)
-        self.dataset_test = Tumor_Samples_Selected(self.cfg.data_dir,self.data_transforms['test'], labels_dict,self.selected)
+        self.dataset_train = Tiles_Selected_CSV(self.cfg.data_dir,self.data_transforms['train'], labels_dict,self.selected)
+        self.dataset_val = Tiles_Selected_CSV(self.cfg.data_dir,self.data_transforms['val'], labels_dict,self.selected)
+        self.dataset_test = Tiles_Selected_CSV(self.cfg.data_dir,self.data_transforms['test'], labels_dict,self.selected)
         patch_labels_list = patch_labels(self.cfg.selected_patches_json,self.cfg.label_dir)
         indices = list(range(len(self.dataset_train)))
 
@@ -35,6 +35,7 @@ class WSI_Data_Interface(pl.LightningDataModule):
 
 
     def train_dataloader(self):
+
         return DataLoader(self.dataset_train, batch_size=self.cfg.train_dataloader.batch_size, 
                                            sampler=self.sampler['train'],num_workers = self.cfg.train_dataloader.num_workers)
 

@@ -3,7 +3,7 @@ from data.data_interface import WSI_Data_Interface
 from utils.utils import *
 from architechture.model_interface  import model_interface
 # from data.dataloader import Tiles_Selected
-from data.dataloader_csv import *
+from data.data_interface import *
 #----> Helper Libraries
 import json
 import argparse

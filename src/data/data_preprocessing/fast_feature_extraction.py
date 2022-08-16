@@ -5,18 +5,18 @@ from img2vec_pytorch import Img2Vec
 from PIL import Image
 import json
 
-data_path = '/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Images_Tiled'
+import argparse
 
-folders = []
-with os.scandir(data_path) as folder_list:
-    for folder in folder_list:
-        if(folder.is_dir()):
-            folders = folders + [folder.path]
-
-img2vec = Img2Vec(cuda=True,model='densenet')
+parser = argparse.ArgumentParser(description='Script to extract features from using pretrained densenet on ImageNet -> Generates a json file for each wsi with features of all patches from a wsi')
+parser.add_argument("src",help = 'Dataset Source')
+parser.add_argument('dst',help='Destination Folder to store the Extracted Features')
+args = parser.parse_args()
+config = vars(args)
 
 
-def image_feature_extractor(path_tiled):
+
+
+def image_feature_extractor(path_tiled,img2vec,dst_path):
 
     patches = []
     patches = glob(path_tiled+'/**/*.png',recursive = True)
@@ -32,9 +32,21 @@ def image_feature_extractor(path_tiled):
 
     print(len(feature_dictionary))
     file_name = path_tiled.split('/')[-1] + '_feature_vectors_densenet.json'
-    with open(os.path.join('/mnt/largedrive0/katariap/feature_extraction/data/Dataset/DenseNet_Features',file_name),"w") as file:
+    with open(os.path.join(dst_path,file_name),"w") as file:
         file.write(json.dumps(feature_dictionary)) 
 
 
-for folder in folders:
-    image_feature_extractor(folder)
+if __name__ == '__main__':
+
+    src_path = config['src']
+    dst_path = config['dst']
+
+    folders = []
+    with os.scandir(src_path) as folder_list:
+        for folder in folder_list:
+            if(folder.is_dir()):
+                folders = folders + [folder.path]
+
+    img2vec = Img2Vec(cuda=True,model='densenet')
+    for folder in folders:
+        image_feature_extractor(folder,img2vec,dst_path)

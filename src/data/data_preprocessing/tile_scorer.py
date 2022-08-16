@@ -65,10 +65,6 @@ def nuclei_ratio_for_wsi(path_of_image,dst_path):
             patch_nuclei_percent = nuclei_ratio_for_patch(patch)
             nuclei_percent[patch] = patch_nuclei_percent
 
-            # if((i % 100 == 0) and i > 0 ) :
-
-            #     print('Nuclei Ratio Calculated for {} patches'.format(i))
-            # i = i+1
 
         except:
             print('Error With Patch : {}'.format(patch))
@@ -171,5 +167,3 @@ if __name__ == '__main__':
 
         nuclei_ratio_for_dataset(src_path,dst_path)
 
-
-# nuclei_ratio_for_dataset_histolab('/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Images_Tiled')

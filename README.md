@@ -36,6 +36,7 @@ Additional flags that can be passed :
 ## Running External Cohorts on This Code
 
 ## Preprocessing Image Dataset (.vsi Images) :
+<img src="/docs/WSI_Processing.png"  align="center" />
 
 ### Creating Image Tiles/Patches Using QuPath:
 1. Open QuPath -> File -> Project -> Create Project -> New Folder -> Open
@@ -43,7 +44,7 @@ Additional flags that can be passed :
 3. Go to search entry in project at the bottom -> type 'overview' -> Right Click on Test_Project -> Remove Images
 4. Select Any Image -> Workflow -> Create Script -> File -> Open  ( Select The Script For Tiling ).
 
-QuPath Script Link : [a relative link](/src/data/data_preprocessing/Tile_Exporter.groovy)
+[QuPath Script Link](/src/data/data_preprocessing/Tile_Exporter.groovy)
 The Script is also Present in the Backup Drive to Run it Directly on the dataset.
 
 Tiling Parameters in the Script That Can be Changed: 
@@ -64,7 +65,7 @@ This is done using the file size of the created image patches. The python script
 Default value for file size for 1000 pixel .png images is : 1 mb.
 The File Size can be determined by sorting the patches based on file size using file explorer and then determine the appropriate threshold.
 
-Remove Tiles Python Script : [a relative link](/data/Code/kimianet_feature_extractor/src/data/data_preprocessing/remove_empty_tiles.py)
+[Remove Empty Tile Script](src/data/data_preprocessing/remove_empty_tiles.py)
 
 Sample Code For running the Script:
 ```shell
@@ -96,7 +97,7 @@ REQUIREMENTS:
 ### Patch/Tile Score Calculation 
 Score Can be calculated by just taking into consideration the number of nuclei or by using the histolab's implementation of tissue ratio plus the nuclei ratio.
 
-[Tile Scorer Script](/kimianet_feature_extractor/src/data/data_preprocessing/tile_scorer.py)
+[Tile Scorer Script](/src/data/data_preprocessing/tile_scorer.py)
 
 Arguments for the script:
 * `src` : src dataset folder
@@ -125,7 +126,7 @@ Project Organization
     │   ├── Tiled_Dataset  <- The final, canonical data sets for modeling.
     │   └── raw            <- The original, immutable data dump.
     │
-    ├── docs               <- A default Sphinx project; see sphinx-doc.org for details
+    ├── docs               <- A default 
     │
     ├── models             <- Trained and serialized models, model predictions, or model summaries
     │
@@ -150,7 +151,20 @@ Project Organization
         |    └──bermanlab.yaml  <- configurations for training and testing the model
         |
         ├── data           <- Scripts to transform data , dataloaders , dataset classes
-        │   └── make_dataset.py
+        │   ├── data_preprocessing
+        |           ├──cluster_dataset.ipynb
+        |           ├──fast_feature_extraction.py
+        |          
+        |                mean_std_cal.py
+        |                remove_empty_tiles.py
+        |                select_patches.py
+        |                stain_normalization.py
+        |                Tile_Exporter.groovy
+        |                tile_scorer.py
+        |               
+        |               
+        |
+        |
         │
         ├── features       <- Scripts to turn raw data into features for modeling
         │   └── build_features.py

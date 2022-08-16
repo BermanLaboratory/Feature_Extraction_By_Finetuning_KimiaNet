@@ -10,29 +10,25 @@ from matplotlib import pyplot as plt
 import os
 from histomicstk.preprocessing.augmentation.color_augmentation import rgb_perturb_stain_concentration, perturb_stain_concentration
 import argparse
+import glob
+import multiprocessing
 
 norm = {
     'mean': np.array([0.8388, 0.6859,  0.8174]),
     'sd': np.array([0.0755, 0.1486, 0.0631]),
 }
-cnorm = {
+tcga_norm = {
     'mu': np.array([8.74108109, -0.12440419,  0.0444982]),
     'sigma': np.array([0.6135447, 0.10989545, 0.0286032]),
 }
 
-tissue_rgb = np.array(Image.open('/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Images_Tiled/Sample 128.vsi - 20x/Sample 128.vsi - 20x [x=12000,y=30000,w=1000,h=1000].png').convert('RGB'))
-tissue_rgb_normalized = reinhard(
-    tissue_rgb, target_mu=cnorm['mu'], target_sigma=cnorm['sigma'])
 
-# print(type(tissue_rgb_normalized))
-
-# image = Image.fromarray(tissue_rgb_normalized.astype(np.uint8))
-cv2.imwrite(file_path, cv2.cvtColor(tissue_rgb_normalized, cv2.COLOR_RGB2BGR))
-
-def Reinhard_Using_mean_and_sd(norm,image_path):
+def Reinhard_Using_mean_and_sd(target_folder,norm,image_path):
 
     tissue_rgb = np.array(Image.open(image_path))
-    return reinhard(tissue_rgb, target_mu=norm['mu'], target_sigma=norm['sigma']))
+    image =  reinhard(tissue_rgb, target_mu=norm['mu'], target_sigma=norm['sigma'])
+    cv2.imwrite(os.path.join(target_folder,image_path.split[-1]), cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
+
 
 def Reinhard(target_image, sample_image):
     target_image = staintools.read_image(target_image)
@@ -69,26 +65,62 @@ def Normalize(method, target_image, sample_image):
     
     return result
 
-def RandomNormalize(target_image,sample_image):
+def RandomNormalize(target_image,sample_image,target_folder):
     number = random.random()
+    image = ''
     if(number < 0.333):
-        return Normalize("Vahadne",target_image,sample_image)
+        image =  Normalize("Vahadne",target_image,sample_image)
     elif(number > 0.666):
-        return Normalize("Macenko",target_image,sample_image)
-    else: return Normalize("Reinhard",target_image,sample_image)
+        image =  Normalize("Macenko",target_image,sample_image)
+    else: image = Normalize("Reinhard",target_image,sample_image)
+
+    cv2.imwrite(os.path.join(target_folder,sample_image.split[-1]), cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
 
 
+def normalize_dataset(type_norm,dataset_path,target_path,target_image,norm):
+
+    patches = []
+    with os.scandir(dataset_path) as files:
+        for file in files:
+            if file.name.endswith('.png'):
+                patches.append(file.path)
+    
+    processes = []
+
+    if(type_norm == 'mean_and_std'):
+
+        for file in files:
+
+            p = multiprocessing.Process(target = Reinhard_Using_mean_and_sd,args = (target_path,norm,file))
+            processes.append()
+            p.start()
+        
+        for process in processes:
+            process.join()
+
+    
+
+    else:
+        for file in files:
+
+            p = multiprocessing.Process(target = RandomNormalize,args = (target_image,file,target_path))
+            processes.append()
+            p.start()
+        
+        for process in processes:
+            process.join()
+    
 
 
-parser = argparse.ArgumentParser(description='Script to Remove Empty Tiles from the Images Using File Size')
+parser = argparse.ArgumentParser(description='Script for Stain Normalization')
 parser.add_argument("src",help = 'Source to run the Script on - Can be a single folder or directory with muliple folders')
-parser.add_argument('--file_size',type = int,default = 1,help='The Tiles having file size less than this argument will be removed. (Pass an Integer in mb)')
+parser.add_argument('dst',help= 'Destination for saving the normalized images')
+parser.add_argument('--type',default='mean_and_std',help = 'Due Stain Norm using mean_std or using a reference image')
+parser.add_argument('--standard',help = 'Image Path for which to standardize images with')
 args = parser.parse_args()
 config = vars(args)
 
 if __name__ == '__main__':
-
-    size = config['file_size']
 
     folder_paths = []
     with os.scandir(config['src']) as folder_list:
@@ -96,34 +128,11 @@ if __name__ == '__main__':
             if(folder.is_dir()):
                 folder_paths.append(folder.path)
 
-    if (len(folder_paths) == 0):
+    
+    src_path = config['src']
+    dst_path = config['dst']
+    type_norm = config['type']
+    target_image = config['standard']
 
-        print('Source Is A Single Folder')
-
-        count = 0
-        
-        with os.scandir(config['src']) as files:
-            for file in files:
-                
-        folder_name = config['src'].split('/')[-1]
-        print('{} Files Removed from folder {}'.format(count,folder_name))
-
-    else:
-
-        print('There are {} folders in the directory to process'.format(len(folder_paths)))
-        for folder in folder_paths:
-            count = 0
-            folder_name = folder.split('/')[-1]
-            print('File Removal Started for folder : {}'.format(folder_name))
-            with os.scandir(folder) as files:
-                for file in files:
-                    if (os.path.getsize(file.path)/(1024*1024)) <= size :
-                        os.remove(file.path)
-                        count = count + 1
-                        if count % 100 == 0 :
-                            print('         {} files removed'.format(count))
-            
-            print('{} Files Removed from folder {}'.format(count,folder_name))
-
-
-    print('ALL FILES HAVING FILE SIZE <= {} mb ARE SUCCESSFULLY REMOVED.'.format(size))
+    for folder in folder_paths:
+        normalize_dataset(type_norm,folder,dst_path,target_image,tcga_norm)

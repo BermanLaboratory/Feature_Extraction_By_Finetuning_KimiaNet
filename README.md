@@ -36,7 +36,7 @@ Additional flags that can be passed :
 ## Running External Cohorts on This Code
 
 ## Preprocessing Image Dataset (.vsi Images) :
-<img src="/docs/WSI_Processing.png"  align="center" />
+<img src="/docs/WSI_Processing.png"  height = '700px' align="center" />
 
 ### Creating Image Tiles/Patches Using QuPath:
 1. Open QuPath -> File -> Project -> Create Project -> New Folder -> Open

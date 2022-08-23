@@ -23,17 +23,15 @@ from torchinfo import summary
 
 '''Todo:
 1. Update Requirement file
-2. Shift Callbacks to different utils files
 3. Test the -> test Code.
-4. Add Preprocessing Code to the repository
 5. Feature Visualisation Code
 6. Feature Importance Code:
 	Added The Code -> Make it to work with Command Line
 7. Extracting the heatmaps for each feature.
-8. Construction of ROC Curves for prediction
+
 9. Silhoutte Algorithm
 10. Clustering for patch selection
-12. Gini Index Calculation Using Extracted Features
+ -> code Added 
 13. Mean and Standard deviation of dataset: For Reinhard Normalization
 		Added in the Dataloader
 		Using Mean and Standard dev already given
@@ -41,6 +39,26 @@ from torchinfo import summary
 15. Add Statistics Calculation to the code
 16. Learning Rate and Batch Size Optimizer
 		Learning Rate added -> Move it to utils file
+
+17. Add docstrings to all the functions in the code
+18. Write all the input and output of each file in the code.
+19. Add Python  Path addition to the code
+20. Description and use of each file with references and citation.
+21. Sample outputs add to the github page.
+22. Test Runs for all the code.
+23. Directory structure required to run the files
+23. Update the requirements file -> add that to readme as well
+24. Project Directory Readme complete
+25. What do you mean by fine tuning
+26. Yaml file description
+27. why pytorch lightning
+28. What is hyperparameter tuning and why?
+29. Short QuPath Videos
+30. Add capacity for n>2
+31. wandb connection check
+32. Table for all the files
+33. Python multiprocessing module -> info reference
+34. Using Screen for running stuff
 '''
 
 def parse():
@@ -64,13 +82,12 @@ def main(cfg):
 	
 
 	#----> Dataset And Interface Intitialization
-
 	
 	data_module = WSI_Data_Interface(cfg)
 
 	#----> Model Initialization
 
-	model = model_interface(cfg.Model.pretrained_weights,cfg.Model.n_classes)
+	model = model_interface(cfg.Model.pretrained_weights,cfg.Optimizer.lr,cfg.Model.n_classes)
 
 	# summary(model.model, input_size=(4, 3,1000,1000))
 

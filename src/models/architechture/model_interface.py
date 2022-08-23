@@ -13,11 +13,11 @@ def model_initializer(kimianet_weights,num_classes):
     num_features = model.classifier.in_features
     model = fully_connected(model.features,num_features,num_classes)
     
-    # model_dict = model.state_dict()
-    # pretrained_dict = torch.load(kimianet_weights,map_location=torch.device('cpu'))
-    # pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
-    # model_dict.update(pretrained_dict) 
-    # model.load_state_dict(model_dict)
+    model_dict = model.state_dict()
+    pretrained_dict = torch.load(kimianet_weights,map_location=torch.device('cpu'))
+    pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
+    model_dict.update(pretrained_dict) 
+    model.load_state_dict(model_dict)
 
     return model
 

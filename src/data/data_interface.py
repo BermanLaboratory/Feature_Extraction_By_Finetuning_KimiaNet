@@ -27,6 +27,9 @@ class WSI_Data_Interface(pl.LightningDataModule):
         self.dataset_train = Tiles_Selected_CSV(self.cfg.data_dir,self.data_transforms['train'], labels_dict,self.selected)
         self.dataset_val = Tiles_Selected_CSV(self.cfg.data_dir,self.data_transforms['val'], labels_dict,self.selected)
         self.dataset_test = Tiles_Selected_CSV(self.cfg.data_dir,self.data_transforms['test'], labels_dict,self.selected)
+        # self.dataset_train = Tiles_Selected_Image_Array(self.cfg.data_dir,self.data_transforms['train'], labels_dict,self.selected)
+        # self.dataset_val = Tiles_Selected_Image_Array(self.cfg.data_dir,self.data_transforms['val'], labels_dict,self.selected)
+        # self.dataset_test = Tiles_Selected_Image_Array(self.cfg.data_dir,self.data_transforms['test'], labels_dict,self.selected)
         patch_labels_list = patch_labels(self.cfg.selected_patches_json,self.cfg.label_dir)
         indices = list(range(len(self.dataset_train)))
 

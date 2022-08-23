@@ -18,10 +18,13 @@ from skimage import io, transform
 import torch.nn.functional as F
 from PIL import Image
 import pickle	
-from models.architechture.model_interface import model_interface
+from architechture.model_interface import model_interface
 import json
-from data.dataloader import dataset_labels
+# from architechture.
+# from data.dataloader import dataset_labels
 from torch.utils.data.sampler import SubsetRandomSampler
+from data.data_interface import *
+from utils.utils import *
 
 plt.ion()   # interactive mode
 os.environ['CUDA_VISIBLE_DEVICES'] = '0' 
@@ -30,6 +33,12 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 train_dir = '/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Images_Tiled'
 labels_dict = dataset_labels('/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Data.csv')
 data_transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
+
+config_file_path = '/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/config/bermanlab.yaml'
+cfg = read_yaml(config_file_path)
+checkpoint_path = '/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models/feature_extraction-epoch=08-val_loss=0.8935.ckpt'
+model = model_interface.load_from_checkpoint(checkpoint_path,kimianet_weights = cfg.Model.pretrained_weights,num_classes = cfg.Model.n_classes,learning_rate = cfg.Optimizer.lr)
+
 
 class Tiles_Selected_CSV(Dataset):
 
@@ -59,30 +68,30 @@ class Tiles_Selected_CSV(Dataset):
 
         return image,patch_name
 
-with open("/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/data/selected_180_with_new.json", 'r') as f:
+with open("/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/data/selected_tiles/selected_180_with_new.json", 'r') as f:
         selected = json.load(f)
 dataset = Tiles_Selected_CSV(train_dir,data_transform, labels_dict,selected)
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=16, num_workers = 40)
 
-validation_split = .2
-shuffle_dataset = True
-random_seed= 13
+# validation_split = .2
+# shuffle_dataset = True
+# random_seed= 13
 
-# Creating data indices for training and validation splits:
-dataset_size = len(dataset)
-print(dataset_size)
-indices = list(range(dataset_size))
-split = int(np.floor(validation_split * dataset_size))
-if shuffle_dataset :
-    np.random.seed(random_seed)
-    np.random.shuffle(indices)
-train_indices, val_indices = indices[split:], indices[:split]
+# # Creating data indices for training and validation splits:
+# dataset_size = len(dataset)
+# print(dataset_size)
+# indices = list(range(dataset_size))
+# split = int(np.floor(validation_split * dataset_size))
+# if shuffle_dataset :
+#     np.random.seed(random_seed)
+#     np.random.shuffle(indices)
+# train_indices, val_indices = indices[split:], indices[:split]
 
-# Creating PT data samplers and loaders:
-train_sampler = SubsetRandomSampler(train_indices)
-valid_sampler = SubsetRandomSampler(val_indices)
-print(len(train_indices))
-sampler = {'train':train_sampler,'val':valid_sampler}
+# # Creating PT data samplers and loaders:
+# train_sampler = SubsetRandomSampler(train_indices)
+# valid_sampler = SubsetRandomSampler(val_indices)
+# print(len(train_indices))
+# sampler = {'train':train_sampler,'val':valid_sampler}
 
 def extract_features(model):
 
@@ -109,10 +118,10 @@ def extract_features(model):
         time_elapsed // 60, time_elapsed % 60))
 
 
-weights = '/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models/KimiaNetPyTorchWeights.pth'
-model = model_interface.load_from_checkpoint('/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/lightning_logs/pytorchlightning_lightning_logs/2mndwf27_4/checkpoints/epoch=19-step=56260.ckpt',sampler=sampler,dataset=dataset,kimianet_weights = weights,learning_rate = 0.0001,batch_size = 8)
+# weights = '/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models/KimiaNetPyTorchWeights.pth'
+# model = model_interface.load_from_checkpoint('/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/lightning_logs/pytorchlightning_lightning_logs/2mndwf27_4/checkpoints/epoch=19-step=56260.ckpt',sampler=sampler,dataset=dataset,kimianet_weights = weights,learning_rate = 0.0001,batch_size = 8)
 model = model.to(device)
-print(model.learning_rate)
+# print(model.learning_rate)
 
 model.eval()
 

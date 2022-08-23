@@ -11,7 +11,7 @@ from histomicstk.preprocessing.color_normalization import reinhard
 
 class Tiles_Selected_CSV(Dataset):
 
-    def __init__(self,data_path,transform,labels_dict,selected_patches,):
+    def __init__(self,data_path,transform,labels_dict,selected_patches):
         """
         Args: 
             data_path : path to input dataset
@@ -48,7 +48,35 @@ class Tiles_Selected_CSV(Dataset):
         return image,label
 
 
+class Tiles_Selected_Image_Array(Dataset):
 
+    def __init__(self,data_path,transform,labels_dict,selected_patches):
+
+        self.data_path = data_path
+        self.image_patches = selected_patches
+        self.transform = transform
+        self.labels_dict = labels_dict
+        self.image_data = []
+
+        for patch in self.image_patches:
+
+            self.image_data = self.image_data + [Image.open(patch).convert('RGB')]
+
+
+    def __len__(self):
+
+        return len(self.image_patches)
+
+    def __getitem__(self,index):
+
+        # image = Image.open(self.image_patches[index]).convert('RGB')
+        image = self.image_data[index]
+        patch_name = self.image_patches[index].split('/')[-1]
+        image_name = self.image_patches[index].split('/')[-2]
+        label = self.labels_dict[int(((image_name).split(' ')[1]).split('.')[0])]
+        image = self.transform(image)
+
+        return image,label
 
 class Tiles_Selected(Dataset):
 

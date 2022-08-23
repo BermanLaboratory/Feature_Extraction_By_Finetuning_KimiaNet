@@ -42,6 +42,7 @@ def select_patches_cluster_nuclei_ratio(cluster_selected,nuclei_ratio_folder):
     
     return selected
 
+
 selected = select_patches_cluster_nuclei_ratio('/mnt/largedrive0/katariap/feature_extraction/data/Dataset/selected_after_clustering.csv','/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Nuclei_Ratio_histolab')
-with open("/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/data/selected_clustering_500.json", 'w') as f:
+with open("/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/data/selected_clustering_500_final.json", 'w') as f:
     json.dump(selected, f, indent=2) 

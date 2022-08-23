@@ -41,22 +41,24 @@ def nuclei_ratio_for_patch(path_of_patch):
     return (number_of_black_pixels/(number_of_black_pixels+number_of_white_pixels))
 
 
-def nuclei_ratio_for_wsi(path_of_image,dst_path):
+def nuclei_ratio_for_wsi(wsi_path,dst_path):
     
     patches = []
-    name = path_of_image.split('/')[-1]
+    name = wsi_path.split('/')[-1]
     
-    with os.scandir(path_of_image) as files:
-        for file in files:
-            if file.name.endswith('.png'):
-                if os.path.getsize(file.name) > 0 :
-                    patches.append(file.name)
+    # with os.scandir(path_of_image) as files:
+    #     for file in files:
+    #         if file.name.endswith('.png'):
+    #             if os.path.getsize(file.name) > 0 :
+    #                 patches.append(file.name)
 
+    patches = glob(wsi_path+'/**/*.png',recursive = True)
+    
+    print('Nuclei Ratio Calculaton Started for : {}'.format(name))
     print('Number of Patches in {} are : {}'.format(name,len(patches)))
 
     nuclei_percent = {}
 
-    i = 0
 
     for patch in patches:
 

@@ -92,3 +92,4 @@ src/wandb/
 src/lightning_logs/
 src/data/selected_tiles/
 src/logs/
+src/models/wandb/

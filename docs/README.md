@@ -5,10 +5,6 @@ Finetuning DenseNet121 architechture using weights of the model provided by Kimi
 
 ## Updates:
 
-## Pre-requisites:
-    * Linux
-    * 
-
 ## Testing And Evaluation Script
 
 For training the model on custom dataset
@@ -36,6 +32,7 @@ Additional flags that can be passed :
 ## Running External Cohorts on This Code
 
 ## Preprocessing Image Dataset (.vsi Images) :
+
 <img src="/docs/WSI_Processing.png"  height = '700px' align="center" />
 
 ### Creating Image Tiles/Patches Using QuPath:
@@ -60,7 +57,8 @@ Right Click on the Script Editor of Qupath: * Choose 'Run' For A single WSI
                                             * Choose 'Run For Project' For Running the Script for the complete project
 
 
-### Remove Tiles That Have No info in them.
+### Removing Empty Tiles/Patches 
+
 This is done using the file size of the created image patches. The python script will run directly by just using the dataset folder and file size using command line.
 Default value for file size for 1000 pixel .png images is : 1 mb.
 The File Size can be determined by sorting the patches based on file size using file explorer and then determine the appropriate threshold.
@@ -75,24 +73,64 @@ python remove_empty_tiles.py TILED_DATASET_PATH
 Optional Arguments:
 `--file_size` : File Size Threshold ( Default: 1)
 
+Result of Removing Tiles based on file size:
+<img src="/docs/Empty_Tiles_Removal.jpg"  height = '300px' width = '800px' align="center" />
+
+### Clustering of the patches to remove Tiles with artifacts in them
+#### 1. Feature Extraction Using Pretrained DenseNet:
+
+```shell
+python fast_feature_extraction.py SRC_PATH DST_PATH
+```
+* `src`: The Path Can be a single folder containing Tiles/Patches or a Directory Containing Multiple folders for Each WSI
+* `dst`: The Path Where to Store the Extracted Features.
+
+Running this file will output a json file with the features corresponding to each Patch in a WSI folder.
+The Json file will be in the form of a dictionary - Can be read in python using
+```python
+feature_file = FILE_PATH
+with open(feature_file,"r") as file:
+        feature_dictionary = json.loads(file.read())
+```
+[img2vec](https://github.com/christiansafka/img2vec) python library has been used to extract the features from pretrained pytroch models.
+The Model Used for feature extraction can also be changed depending on the requirement.
+
+Sample Src And Dst directory structure after running the python script
+```bash
+SRC_DIRECTORY/
+	├── WSI_1
+    		├── Patch.png
+    		├── Patch_2.png
+    		└── ...
+DST_DIRECTORY/
+   ├──WSI_1_feature_vectors_densenet.json
+         
+```
+
+#### 2. Clustering of the dataset based on the extracted features
+
+A jupyter notebook has been used for this specific file because visualization and selection of clusters is required to remove the artifacts from the dataset.
+
+For performing PCA and K means Clustering -> META AIs [faiss](https://github.com/facebookresearch/faiss) library has been used. 
+It is much more faster and effecient than standard implementations of PCA and K means. As we are dealing with large number of features and images
+This is the best to use. Faiss is almost 10X faster and has very low error rate.
+
+[Dataset Clustering Notebook ](/src/data/data_preprocessing/cluster_dataset_densenet.ipynb)
+
+* The Feature Vector Files are loaded. The Feature Space is reduced from 1024 to 500 dimensions using PCA.
+* The Images are Clustered Based on those features.
+* The Clusters are visualized And Relevant One's are Selected.
+* A final csv file containing the selected Patches is saved as output.
+
+Run Each cell in the notebook sequentially. Modify the FILE_PATHS of dataset and feature_vector folders if required.
+Using This approach The following artifacts can be easily removed from the dataset:
+
+<img src="/docs/Removing_Unwanted_Tiles.jpg"  height = '300px' width = '800px' align="center" />
+
 ### Getting The Image Tiles/Patches to the server
 ```shell
 scp -r 'local dataset folder path' USER@SERVER_IP:'server directory folder path'
 ```
-### Stain Normalization And Color Augmetation
-Stain Normalization Can Either be Done dynamically when loading images to the deep learning model or creating by creating a completely new dataset.
-
-* For Creating a New Dataset After Stain Normalization
-REQUIREMENTS:
- * StainTools, HistomicsTK
-
-* For Dynamically Loading Images That are Stain Normalized Into the model
-
-### Patch Clustering Based on DenseNet Features
-
-#### Feature Extraction
-
-#### Clustering
 
 ### Patch/Tile Score Calculation 
 Score Can be calculated by just taking into consideration the number of nuclei or by using the histolab's implementation of tissue ratio plus the nuclei ratio.
@@ -109,13 +147,31 @@ Sample Command For Running the Script:
 python tile_scorer.py DATASET_PATH DESTINATION_PATH --type nuclei_and_tissue
 ```
 
+### Stain Normalization And Color Augmetation
+
+Stain Normalization Can Either be Done dynamically when loading images to the deep learning model or creating by creating a completely new dataset.
+Reinhard, Vahadne, Macenko methods are being used for stain normalization. The implementations of these methods by [HistomicsTk]() and [StainTools]() have been used.
+
+The Patches can be normalized using a standard patch or using mean and sd for the target color space.
+
+```shell
+python 
+```
+
+* `--type`
+* `--standard`
+
+## Running The Model:
+Yaml file description
+Pytorch Lightning Description
+Fine Tuning 
+Explaning The Parameters
+
 ## Feature Visualization And Clustering
 
 ## Trained Model Checkpoints
 
-## File Descriptions
-config:
-bermanlab.yaml :
+
 
 Python Multiprocessing description
 
@@ -126,6 +182,10 @@ This file contains all the parameters that are required to train or test the mod
 The parameters are:
 Descripton of the parameters:
 
+### General Python File Commonalities:
+1. Python Multiprocessing Module
+2. glob
+3. os module
 
 ## Handling Github
 data directory if empty add to source control

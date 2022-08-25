@@ -3,14 +3,14 @@ import numpy as np
 import time
 from PIL import Image
 import cv2
-import staintools
+# import staintools
 import cv2
 import random
 from matplotlib import pyplot as plt
 import os
 from histomicstk.preprocessing.augmentation.color_augmentation import rgb_perturb_stain_concentration, perturb_stain_concentration
 import argparse
-import glob
+from glob import glob
 import multiprocessing
 
 norm = {
@@ -27,7 +27,8 @@ def Reinhard_Using_mean_and_sd(target_folder,norm,image_path):
 
     tissue_rgb = np.array(Image.open(image_path))
     image =  reinhard(tissue_rgb, target_mu=norm['mu'], target_sigma=norm['sigma'])
-    cv2.imwrite(os.path.join(target_folder,image_path.split[-1]), cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
+    final_path = os.path.join(target_folder,image_path.split('/')[-1])
+    cv2.imwrite(final_path, cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
 
 
 def Reinhard(target_image, sample_image):
@@ -74,25 +75,22 @@ def RandomNormalize(target_image,sample_image,target_folder):
         image =  Normalize("Macenko",target_image,sample_image)
     else: image = Normalize("Reinhard",target_image,sample_image)
 
-    cv2.imwrite(os.path.join(target_folder,sample_image.split[-1]), cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
+    cv2.imwrite(os.path.join(target_folder,sample_image.split('/')[-1]), cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
 
 
 def normalize_dataset(type_norm,dataset_path,target_path,target_image,norm):
 
-    patches = []
-    with os.scandir(dataset_path) as files:
-        for file in files:
-            if file.name.endswith('.png'):
-                patches.append(file.path)
     
     processes = []
+    files = glob(dataset_path+'/**/*.png',recursive = True)
 
     if(type_norm == 'mean_and_std'):
 
         for file in files:
+            print(file)
 
             p = multiprocessing.Process(target = Reinhard_Using_mean_and_sd,args = (target_path,norm,file))
-            processes.append()
+            processes.append(p)
             p.start()
         
         for process in processes:
@@ -104,7 +102,7 @@ def normalize_dataset(type_norm,dataset_path,target_path,target_image,norm):
         for file in files:
 
             p = multiprocessing.Process(target = RandomNormalize,args = (target_image,file,target_path))
-            processes.append()
+            processes.append(p)
             p.start()
         
         for process in processes:
@@ -121,6 +119,7 @@ args = parser.parse_args()
 config = vars(args)
 
 if __name__ == '__main__':
+
 
     folder_paths = []
     with os.scandir(config['src']) as folder_list:

@@ -22,6 +22,11 @@ args = parser.parse_args()
 config = vars(args)
 
 def nuclei_ratio_for_patch(path_of_patch):
+
+    """
+        Inputs: path_of_patch: Patch to calculate nuclei_ratio for
+        Ouputs: nuclei_ratio
+    """
     
     input_image = skimage.io.imread(path_of_patch)[:,:,:3]
     
@@ -30,9 +35,9 @@ def nuclei_ratio_for_patch(path_of_patch):
     W_matrix = np.array([stain_color_map[stain] for stain in stains]).T
     
     stain_deconvolved = htk.preprocessing.color_deconvolution.color_deconvolution(input_image,W_matrix)
-    
-    hematoxylin_channel = stain_deconvolved.Stains[:,:,0]
+    hematoxylin_channel = stain_deconvolved.Stains[:,:,0] # Only H channel is used for Nuclei Ratio Calculation
     (threshold,black_white_image) = cv2.threshold(hematoxylin_channel,180,255,cv2.THRESH_BINARY)
+
     
     #COUNTING THE NUMBER OF BLACK PIXELS IN THE FINAL IMAGE FOR NUCLEI APPROXIMATION
     number_of_white_pixels = np.sum(black_white_image == 255)
@@ -42,16 +47,17 @@ def nuclei_ratio_for_patch(path_of_patch):
 
 
 def nuclei_ratio_for_wsi(wsi_path,dst_path):
+
+    """
+        The Nuclei Ratio will be stored in a CSV file in the dst_path
+
+        Inputs:
+            wsi_path: Path To Directory That contains patches of one WSI
+            dst_path: Path to directory to store the calculated scores
+    """
     
     patches = []
     name = wsi_path.split('/')[-1]
-    
-    # with os.scandir(path_of_image) as files:
-    #     for file in files:
-    #         if file.name.endswith('.png'):
-    #             if os.path.getsize(file.name) > 0 :
-    #                 patches.append(file.name)
-
     patches = glob(wsi_path+'/**/*.png',recursive = True)
     
     print('Nuclei Ratio Calculaton Started for : {}'.format(name))
@@ -59,14 +65,12 @@ def nuclei_ratio_for_wsi(wsi_path,dst_path):
 
     nuclei_percent = {}
 
-
     for patch in patches:
 
         try :
 
             patch_nuclei_percent = nuclei_ratio_for_patch(patch)
             nuclei_percent[patch] = patch_nuclei_percent
-
 
         except:
             print('Error With Patch : {}'.format(patch))
@@ -84,6 +88,11 @@ def nuclei_ratio_for_wsi(wsi_path,dst_path):
 
 
 def nuclei_ratio_for_dataset(dataset_path,dst_path):
+
+    """
+        This Function Runs nuclei_ratio_for_wsi for each WSI
+        Simultaneously Runs for Multiple WSI for faster processing.
+    """
     
     folders = []
     with os.scandir(dataset_path) as folder_list:
@@ -106,10 +115,24 @@ def nuclei_ratio_for_dataset(dataset_path,dst_path):
 
 def nuclei_ratio_for_patch_histolab(patch_path,scorer):
 
+    """
+        Using Histolab's Implementation for Patch Score Calculation.
+        Inputs:
+            patch_path: Path of The Patch to calculate score for
+            scorer: Histolab Scorer Object for score calculation
+
+        Ouputs:
+            Score for each patch
+    """
+
     Tile_object = Tile(Image.open(patch_path).convert('RGB'),[0,0])
     return scorer(Tile_object)
 
 def nuclei_ratio_for_wsi_histolab(wsi_path,dst_path):
+
+    """
+        Using Histolab's Patch Score Implementation for calculation of score for each Pathc in a WSI
+    """
 
     patches = glob(wsi_path+'/**/*.png',recursive = True)
     scorer = NucleiScorer()
@@ -136,6 +159,11 @@ def nuclei_ratio_for_wsi_histolab(wsi_path,dst_path):
 
 def nuclei_ratio_for_dataset_histolab(dataset_path,dst_path):
 
+    """
+        Running The Histolab Patch Scorer for complete Dataset.
+        The Calculation for Each WSI is done simultaneously usng python's multiprocessing module
+    """
+
     folders = []
     with os.scandir(dataset_path) as folder_list:
         for folder in folder_list:
@@ -143,7 +171,6 @@ def nuclei_ratio_for_dataset_histolab(dataset_path,dst_path):
                 folders = folders + [folder.path]
     
     processes = []
-
 
     for folder in folders:
       
@@ -166,6 +193,5 @@ if __name__ == '__main__':
         nuclei_ratio_for_dataset_histolab(src_path,dst_path)
     
     else:
-
         nuclei_ratio_for_dataset(src_path,dst_path)
 

@@ -11,7 +11,6 @@ if __name__ == '__main__':
 
 
     size = config['file_size']
-    
     folder_paths = []
     with os.scandir(config['src']) as folder_list:
         for folder in folder_list:

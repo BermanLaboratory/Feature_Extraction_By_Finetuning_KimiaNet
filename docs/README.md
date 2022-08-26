@@ -76,6 +76,12 @@ Optional Arguments:
 Result of Removing Tiles based on file size:
 <img src="/docs/Empty_Tiles_Removal.jpg"  height = '300px' width = '800px' align="center" />
 
+
+### Getting The Image Tiles/Patches to the server
+```shell
+scp -r 'local dataset folder path' USER@SERVER_IP:'server directory folder path'
+```
+
 ### Clustering of the patches to remove Tiles with artifacts in them
 #### 1. Feature Extraction Using Pretrained DenseNet:
 
@@ -127,10 +133,6 @@ Using This approach The following artifacts can be easily removed from the datas
 
 <img src="/docs/Removing_Unwanted_Tiles.jpg"  height = '300px' width = '800px' align="center" />
 
-### Getting The Image Tiles/Patches to the server
-```shell
-scp -r 'local dataset folder path' USER@SERVER_IP:'server directory folder path'
-```
 
 ### Patch/Tile Score Calculation 
 Score Can be calculated by just taking into consideration the number of nuclei or by using the histolab's implementation of tissue ratio plus the nuclei ratio.
@@ -147,30 +149,47 @@ Sample Command For Running the Script:
 python tile_scorer.py DATASET_PATH DESTINATION_PATH --type nuclei_and_tissue
 ```
 
+### Final Selection of Patches 
+The Top Patches are finally selected On Basis of the Tile Scores and the results of clustering.
+[select_patches](/src/data/data_preprocessing/select_patches.py)
+
+Arguments for the sript:
+* `cluster` : Path to File with selected Patches after clustering
+* `patch_score`: Path to Directory That contains patch score files
+* `dst`: The Path to store the final json file. Path format : directory/file_name.json'
+
+Sample Command For Running The Script:
+```shell
+python select_patches.py CLUSTERING_RESULT_FILE PATCH_SCORE_FOLDER DST_FILE_PATH
+```
+
 ### Stain Normalization And Color Augmetation
 
 Stain Normalization Can Either be Done dynamically when loading images to the deep learning model or creating by creating a completely new dataset.
-Reinhard, Vahadne, Macenko methods are being used for stain normalization. The implementations of these methods by [HistomicsTk]() and [StainTools]() have been used.
+Reinhard, Vahadne, Macenko methods are being used for stain normalization. The implementations of these methods by [HistomicsTk](https://digitalslidearchive.github.io/HistomicsTK/) and [StainTools](https://github.com/Peter554/StainTools) have been used.
 
 The Patches can be normalized using a standard patch or using mean and sd for the target color space.
 
 ```shell
-python 
+python stain_normalization.py SRC_DIR DST_DIR
 ```
-
-* `--type`
-* `--standard`
+Arguments:
+* `src`: Path to the dataset folder with the Patches
+* `dst`: Path to store the normalized images to.
+* `--type`: Type of normalization to use. using mean_and_std or a reference image
+* `--standard`: Path to the image to be used as a reference for normalization.
 
 ## Running The Model:
 Yaml file description
 Pytorch Lightning Description
 Fine Tuning 
 Explaning The Parameters
+Python Multiprocessing Module Description
+Argparse Description
 
 ## Feature Visualization And Clustering
 
 ## Trained Model Checkpoints
-
 
 
 Python Multiprocessing description
@@ -231,20 +250,14 @@ Project Organization
         |
         ├── data           <- Scripts to transform data , dataloaders , dataset classes
         │   ├── data_preprocessing
-        |           ├──cluster_dataset.ipynb
-        |           ├──fast_feature_extraction.py
-        |          
-        |                mean_std_cal.py
-        |                remove_empty_tiles.py
-        |                select_patches.py
-        |                stain_normalization.py
-        |                Tile_Exporter.groovy
-        |                tile_scorer.py
-        |               
-        |               
-        |
-        |
-        │
+        |           ├── cluster_dataset.ipynb
+        |           ├── fast_feature_extraction.py
+        |           ├── mean_std_cal.py
+        |           ├── remove_empty_tiles.py 
+        |           ├── select_patches.py  
+        |           ├── stain_normalization.py
+        |           ├── Tile_Exporter.groovy
+        |           └── tile_scorer.py 
         ├── features       <- Scripts to turn raw data into features for modeling
         │   └── build_features.py
         │

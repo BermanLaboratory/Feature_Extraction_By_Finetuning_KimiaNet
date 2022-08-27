@@ -1,5 +1,4 @@
 from __future__ import print_function, division
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -20,24 +19,21 @@ from PIL import Image
 import pickle	
 from architechture.model_interface import model_interface
 import json
-# from architechture.
-# from data.dataloader import dataset_labels
+
 from torch.utils.data.sampler import SubsetRandomSampler
 from data.data_interface import *
 from utils.utils import *
+import argparse
 
-plt.ion()   # interactive mode
 os.environ['CUDA_VISIBLE_DEVICES'] = '0' 
-save_address_1024 = '/mnt/largedrive0/katariap/feature_extraction/data/Dataset/kimianet_features/'
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-train_dir = '/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Images_Tiled'
-labels_dict = dataset_labels('/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Data.csv')
-data_transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
 
-config_file_path = '/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/config/bermanlab.yaml'
-cfg = read_yaml(config_file_path)
-checkpoint_path = '/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models/feature_extraction-epoch=08-val_loss=0.8935.ckpt'
-model = model_interface.load_from_checkpoint(checkpoint_path,kimianet_weights = cfg.Model.pretrained_weights,num_classes = cfg.Model.n_classes,learning_rate = cfg.Optimizer.lr)
+parser = argparse.ArgumentParser(description='Script for Feature Extraction From A Trained Model')
+parser.add_argument("save_add",help = 'Path of Directory where to store the extracted features. Add '/' at the end)
+parser.add_argument('model_weights',help= 'Path of the checkpoint file containing model weights)
+parser.add_argument('config',help = 'Path to the config file')
+parser.add_argument('selected',help = 'Path to csv file that contains paths of images whose features are to be extracted')
+args = parser.parse_args()
+config = vars(args)
 
 
 class Tiles_Selected_CSV(Dataset):
@@ -50,7 +46,6 @@ class Tiles_Selected_CSV(Dataset):
         """
         self.data_path = data_path
         self.image_patches = selected_patches
-        # self.image_patches = [patch for patch in self.image_patches if patch.split('/')[-1] in selected_patches]
         self.transform = transform
         self.labels_dict = labels_dict
     
@@ -63,69 +58,62 @@ class Tiles_Selected_CSV(Dataset):
         patch_name = self.image_patches[index].split('/')[-1]
         image_name = self.image_patches[index].split('/')[-2]
         label = self.labels_dict[int(((image_name).split(' ')[1]).split('.')[0])]
-        
         image = self.transform(image)
 
         return image,patch_name
 
-with open("/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/data/selected_tiles/selected_180_with_new.json", 'r') as f:
-        selected = json.load(f)
-dataset = Tiles_Selected_CSV(train_dir,data_transform, labels_dict,selected)
-dataloader = torch.utils.data.DataLoader(dataset, batch_size=16, num_workers = 40)
-
-# validation_split = .2
-# shuffle_dataset = True
-# random_seed= 13
-
-# # Creating data indices for training and validation splits:
-# dataset_size = len(dataset)
-# print(dataset_size)
-# indices = list(range(dataset_size))
-# split = int(np.floor(validation_split * dataset_size))
-# if shuffle_dataset :
-#     np.random.seed(random_seed)
-#     np.random.shuffle(indices)
-# train_indices, val_indices = indices[split:], indices[:split]
-
-# # Creating PT data samplers and loaders:
-# train_sampler = SubsetRandomSampler(train_indices)
-# valid_sampler = SubsetRandomSampler(val_indices)
-# print(len(train_indices))
-# sampler = {'train':train_sampler,'val':valid_sampler}
 
 def extract_features(model):
 
-    since = time.time()
-    model.eval()
-    slide_patches_dict_1024 = {}   
-    count = 0
+    feature_dict = {}   
+    # count = 0
     for ii, (inputs, img_name) in enumerate(dataloader):
         inputs = inputs.to(device)
-        output1, outputs = model(inputs)
-        count = count +1
-        # print(count)
-        output_1024 = output1.cpu().detach().numpy()
-        # output_128 = output2.cpu().detach().numpy()
+        output1, output_2 = model(inputs)
+        # count = count +1
+        output_features = output1.cpu().detach().numpy()
+        
         for j in range(len(outputs)):
-            slide_patches_dict_1024[img_name[j]] = output_1024[j]
-        print(len(slide_patches_dict_1024))
-    outfile_1024 = open(save_address_1024+'FineTuned_Model_Features_dict.pickle','wb')
-    pickle.dump(slide_patches_dict_1024, outfile_1024)
-    outfile_1024.close() 
+            feature_dict[img_name[j]] = output_features[j]
+        # print(len(feature_dict))
+    save_file = open(save_address+'FineTuned_Model_Features_dict.pickle','wb')
+    pickle.dump(feature_dict, save_file)
+    save_file.close() 
 
-    time_elapsed = time.time() - since
-    print('Evaluation completed in {:.0f}m {:.0f}s'.format(
-        time_elapsed // 60, time_elapsed % 60))
+    print("Feature Extraction Is Complete")
 
 
-# weights = '/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models/KimiaNetPyTorchWeights.pth'
-# model = model_interface.load_from_checkpoint('/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/lightning_logs/pytorchlightning_lightning_logs/2mndwf27_4/checkpoints/epoch=19-step=56260.ckpt',sampler=sampler,dataset=dataset,kimianet_weights = weights,learning_rate = 0.0001,batch_size = 8)
-model = model.to(device)
-# print(model.learning_rate)
 
-model.eval()
 
-for param in model.parameters():
-	param.requires_grad = False
+if __name__ == '__main__':
 
-extract_features(model)
+    # config_file_path = '/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/config/bermanlab.yaml'
+   
+    save_address = config['save_add']
+    checkpoint_path = config['model_weights']
+    # save_address = '/mnt/largedrive0/katariap/feature_extraction/data/Dataset/kimianet_features/'
+    config_file_path = config['config']
+    selected_csv = config['selected']
+
+
+    cfg = read_yaml(config_file_path)
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    train_dir = cfg.Data.data_dir
+    labels_dict = dataset_labels(cfg.Data.label_dir)
+
+    with open(selected_csv, 'r') as f:
+        selected = json.load(f)
+    dataset = Tiles_Selected_CSV(train_dir,data_transform, labels_dict,selected)
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=16, num_workers = 40)
+
+    data_transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
+    # checkpoint_path = '/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models/feature_extraction-epoch=08-val_loss=0.8935.ckpt'
+    model = model_interface.load_from_checkpoint(checkpoint_path,kimianet_weights = cfg.Model.pretrained_weights,num_classes = cfg.Model.n_classes,learning_rate = cfg.Optimizer.lr)
+
+    model = model.to(device)
+    model.eval()
+
+    for param in model.parameters(): 
+        param.requires_grad = False
+
+    extract_features(model)

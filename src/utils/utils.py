@@ -13,6 +13,14 @@ from glob import glob
 
 def dataset_labels(csv_file_path):
 
+    """
+    Inputs:
+        csv_file_path: Path to the Data CSV File
+
+    Ouputs:
+        Returns the dictionary with sample ids and Grades
+    """
+
     labels_df = pd.read_csv(csv_file_path)
     labels_df = labels_df.dropna()
     labels_df.astype(int)
@@ -27,13 +35,21 @@ def dataset_labels(csv_file_path):
 
 def patch_labels(selected_json_file_path,data_csv_file_path):
 
+    """
+        Inputs:
+            selected_json_file_path: Path to Selected Patches
+            data_csv_file_path: Path to the Data lables CSV File
+
+        Ouputs:
+            Returns the Patch wise labels list
+    """
+
     with open(selected_json_file_path, 'r') as f:
         selected = json.load(f)
     
     labels_dict = dataset_labels(data_csv_file_path)
 
     labels = []
-
     for select in selected:
 
         image_name = select.split('/')[-2]
@@ -43,6 +59,11 @@ def patch_labels(selected_json_file_path,data_csv_file_path):
     return labels
 
 def data_transforms_dict():
+
+    """
+        Returns the data transforms dictionary that are required to be 
+        applied to train, test and val dataset splits
+    """
 
     data_transforms_dict = {
 	'train': transforms.Compose([
@@ -77,6 +98,19 @@ def read_yaml(fpath=None):
 
 def data_split_random(seed,indices,dataset_size,validation_split = 0.1,shuffle_dataset = False):
 
+    """
+        Inputs:
+            seed: Seed to produce random numbers from
+            indices: The List of Indices of dataset to split
+            dataset_size: The Size of dataset
+            validation_split: val split ratio
+            shuffle_dataset: To Shuffle datset or not
+        Returns:
+            Indices split based on the ratio (The split is random)
+                train_indices,val_indices
+    
+    """
+
     split = int(np.floor(validation_split * dataset_size))
 
     if shuffle_dataset:
@@ -89,6 +123,17 @@ def data_split_random(seed,indices,dataset_size,validation_split = 0.1,shuffle_d
 
 def data_split_balanced(seed,indices,labels_list,validation_split = 0.1):
 
+    """
+        Inputs:
+            seed: seed to generate random numbers.
+            indices: The List of Indices of dataset to split
+            labels_list: List of labels for each image patch
+            validation_slit: split ratio required.
+
+        Returns: 
+            Indices split based on the ratio(The Dataset Split is balanced)
+    """
+
     train_indices, val_indices, train_labels, val_labels = train_test_split(
                                             indices,
                                             labels_list,
@@ -100,6 +145,17 @@ def data_split_balanced(seed,indices,labels_list,validation_split = 0.1):
     return train_indices,val_indices,train_labels,val_labels
 
 def data_sampler_dict(split_type,indices,random_seed,len_dataset,patch_labels_list,train_split = 0.8 ,validation_split=0.1,test_split = 0.1,data_shuffle = True):
+    
+    """
+        Inputs:
+            split_type: can be random or balanced.
+            indices: Indices of the dataset
+            patch_labels_list: list of labels of each image patch
+
+        Returns:
+            train,val and test sampler dictionary is returned based on the type and ratio of split chosen.
+
+    """
 
     ratio_remaining = 1.0 - validation_split
     ratio_test_adjusted = test_split / ratio_remaining
@@ -123,6 +179,11 @@ def data_sampler_dict(split_type,indices,random_seed,len_dataset,patch_labels_li
 
 
 def freeze_dense_blocks(block_list,model):
+    """
+        Inputs:
+            block_list: list of dense blocks to freeze while training
+            model: Model whole dense blocks need to be frozen
+    """
 
     if(1 in block_list):
         for param in model.model.model[0].denseblock1.parameters():

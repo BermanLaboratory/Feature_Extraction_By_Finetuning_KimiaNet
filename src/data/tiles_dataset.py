@@ -13,6 +13,9 @@ class Tiles_Selected_CSV(Dataset):
 
     def __init__(self,data_path,transform,labels_dict,selected_patches):
         """
+
+        Use this dataset class when the Selected Patches were in the form of a CSV File
+
         Args: 
             data_path : path to input dataset
             transform : transformation function
@@ -23,6 +26,9 @@ class Tiles_Selected_CSV(Dataset):
         self.image_patches = selected_patches
         self.transform = transform
         self.labels_dict = labels_dict
+
+        # If Stain Normalization is to be done while dynamically loading the images Then Uncomment the self.cnorm and line 49,50
+
         # self.cnorm = {
         #     'mu': np.array([8.74108109, -0.12440419,  0.0444982]),
         #     'sigma': np.array([0.6135447, 0.10989545, 0.0286032]),
@@ -41,7 +47,6 @@ class Tiles_Selected_CSV(Dataset):
         label = self.labels_dict[int(((image_name).split(' ')[1]).split('.')[0])]
 
         # tissue_normalized = reinhard(np.array(image), target_mu=self.cnorm['mu'], target_sigma=self.cnorm['sigma'])
-
         # image = Image.fromarray(np.uint8(tissue_normalized)).convert('RGB')
         image = self.transform(image)
         

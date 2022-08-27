@@ -6,7 +6,7 @@ General:
     mode: train #train #test
     log_path: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/logs/ #Path to create Training Logs
     project_name: feature_extraction # Will be Used to Sync Wandb logs
-    checkpoints:                     # Path to Store Checkpoints
+    weights_file_path:                     # Which Model to Use while inference or Feature extraction
     run_name: 500-Adam-0.0001-8-CopiesRemoved-GradAccum(64) # Name of the Latest Project Run -> will be the name of wandb run
     grad_accumulation: 8  # This will be used to simulate the Batch Size. New Batch Size : Batch Size * Grad_Accumulation
 Data:

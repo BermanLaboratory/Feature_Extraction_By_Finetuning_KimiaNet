@@ -3,31 +3,14 @@ Feature Extractor
 
 Finetuning DenseNet121 architechture using weights of the model provided by KimiaNet for extracting features From Whole Slide Image Patches relevant to Cancer Grades
 
+FineTuning:
+
+DenseNet121 Architechture
+
+pip install -r /path/to/requirements.txt
+
 ## Updates:
 
-## Testing And Evaluation Script
-
-For training the model on custom dataset
-```shell
-
-python train --config CONFIG_FILE_PATH --mode train
-
-```
-
-For Testing the model of custom model using pretrained weights:
-
-```shell
-
-python train --config CONFIG_FILE_PATH --mode test
-```
-
-Additional flags that can be passed :
-* `--config`: configuration file path
-* `--mode` : train or test mode
-* `--gpus` : gpus to use (default : [2]). Use nvidia-smi to check for free gpus.
-* `--batch_size_train` : batch_size for training the model
-* `--batch_size_test`
-: batch_size for testing the model
 
 ## Running External Cohorts on This Code
 
@@ -170,6 +153,7 @@ Reinhard, Vahadne, Macenko methods are being used for stain normalization. The i
 
 The Patches can be normalized using a standard patch or using mean and sd for the target color space.
 
+Sample Command
 ```shell
 python stain_normalization.py SRC_DIR DST_DIR
 ```
@@ -179,32 +163,63 @@ Arguments:
 * `--type`: Type of normalization to use. using mean_and_std or a reference image
 * `--standard`: Path to the image to be used as a reference for normalization.
 
-## Running The Model:
-Yaml file description
-Pytorch Lightning Description
-Fine Tuning 
-Explaning The Parameters
-Python Multiprocessing Module Description
-Argparse Description
-
-## Feature Visualization And Clustering
-
-## Trained Model Checkpoints
+*If Stain Normalization is to be Done Dynamically while loading images to the model. Check The tiles_dataset.py for instructions.*
 
 
-Python Multiprocessing description
+## Running The Model
 
-Yaml is data serialization language generally used to create the configuration files for the project.
+For Running the model on custom dataset
+Change the Yaml [config_file](/src/config/bermanlab.yaml) with appropriate parameters before running the script.
+The Yaml file can be used to change the mode from train to test.
 
-This file contains all the parameters that are required to train or test the model.
+Pytorch Lightning:
 
-The parameters are:
-Descripton of the parameters:
+```shell
+python main.py --config CONFIG_FILE_PATH 
 
-### General Python File Commonalities:
-1. Python Multiprocessing Module
-2. glob
-3. os module
+```
+Arguments:
+* `config`: configuration file path
+
+## Feature Extraction
+Run the [extract_features.py](/src/models/extract_features.py) to extract features using the fine_tuned model for specific Patches.
+Sample Command
+```shell
+python extract_features.py SAVE_ADD MODEL_WEIGTHS CONFIG SELECTED
+```
+Arguments:
+* `save_add`: Path of Directory Where to store the Extracted Features (Add / after the path)
+* `model_weights`: Path to weights file to use for feature extraction
+* `config`: Path to the model configuration File
+* `selected`: Path to CSV file that contains the List of Paths of Patches whose features are required to be extracted.
+
+*The GPU to be used can be changed in the file itself.*
+
+
+
+
+## Extracted Feature Analysis
+### Feature Importance Calculation
+The Importance of Each Feature is calculated using Support Vector Machines.
+
+Sample Code To Run the [Script](/src/features/feature_importance.py)
+```shell
+
+python feature_importance.py DST_PATH FEATURE_FILE_PATH DATA_CSV_PATH
+```
+Arguments:
+* `dst`: Destination Directory to store the feature importance result csv file
+* `features`: Path of feature file to analyze
+* `labels`: Path to the Data CSV file with sample ids and labels.
+
+## General Commonalities Between The files
+Many of the scripts use python multiprocessing module to run multiple processes simultaneously to speed up the calculation.
+More Details regarding it's Use can be found at : [Python Multiprocessing](https://docs.python.org/3/library/multiprocessing.html)
+
+For Running the Scripts from command line.
+Argparse has been used. 
+For every python script if `python script.py --help` will provide the details of all the arguments required with their description.
+
 
 ## Handling Github
 data directory if empty add to source control
@@ -249,7 +264,7 @@ Project Organization
         |    └──bermanlab.yaml  <- configurations for training and testing the model
         |
         ├── data           <- Scripts to transform data , dataloaders , dataset classes
-        │   ├── data_preprocessing
+        │    └──data_preprocessing
         |           ├── cluster_dataset.ipynb
         |           ├── fast_feature_extraction.py
         |           ├── mean_std_cal.py
@@ -258,9 +273,11 @@ Project Organization
         |           ├── stain_normalization.py
         |           ├── Tile_Exporter.groovy
         |           └── tile_scorer.py 
-        ├── features       <- Scripts to turn raw data into features for modeling
-        │   └── build_features.py
-        │
+        ├── features       
+        │    ├── clustering_extracted_features.ipynb
+        |    ├── feature_analysis.ipynb
+        │    └── feature_importance.py
+        |           
         ├── models    <- Scripts to train models and then use trained models to make predictions
         │   ├── architechture
         |   ├── model architechture

@@ -10,6 +10,8 @@ class WSI_Data_Interface(pl.LightningDataModule):
 
 
         """
+          Inputs: 
+            cfg: Yaml configuration File
         
         """
         super().__init__()
@@ -20,20 +22,22 @@ class WSI_Data_Interface(pl.LightningDataModule):
 
         labels_dict = dataset_labels(self.cfg.label_dir)
 
-        self.data_transforms = data_transforms_dict()
+        self.data_transforms = data_transforms_dict() #Initialize the Data Transforms for train, test and val datasets
+
         with open(self.cfg.selected_patches_json, 'r') as f:
-            self.selected = json.load(f)
+            self.selected = json.load(f)  #Load the List of Selected Image Patches
+
+        #Setup Train, Test And Val Dataset Objects
+        # Not an ideal way to setup datasets. Doing This way because different transforms are required to be applied to different dataset splits.
 
         self.dataset_train = Tiles_Selected_CSV(self.cfg.data_dir,self.data_transforms['train'], labels_dict,self.selected)
         self.dataset_val = Tiles_Selected_CSV(self.cfg.data_dir,self.data_transforms['val'], labels_dict,self.selected)
         self.dataset_test = Tiles_Selected_CSV(self.cfg.data_dir,self.data_transforms['test'], labels_dict,self.selected)
-        # self.dataset_train = Tiles_Selected_Image_Array(self.cfg.data_dir,self.data_transforms['train'], labels_dict,self.selected)
-        # self.dataset_val = Tiles_Selected_Image_Array(self.cfg.data_dir,self.data_transforms['val'], labels_dict,self.selected)
-        # self.dataset_test = Tiles_Selected_Image_Array(self.cfg.data_dir,self.data_transforms['test'], labels_dict,self.selected)
+
         patch_labels_list = patch_labels(self.cfg.selected_patches_json,self.cfg.label_dir)
         indices = list(range(len(self.dataset_train)))
 
-        # Setting Up data Samplers
+        # Setting Up data Samplers for For dataloaders to Use
         self.sampler = data_sampler_dict(self.cfg.split_type,indices,self.random_seed,len(self.dataset_train),patch_labels_list,self.cfg.train_slit,self.cfg.validation_split,self.cfg.test_split,self.cfg.data_shuffle)
 
 

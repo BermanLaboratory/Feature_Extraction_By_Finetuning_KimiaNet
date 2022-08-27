@@ -22,14 +22,11 @@ from torchinfo import summary
 
 
 '''Todo:
-1. Update Requirement file
 3. Test the -> test Code.
 5. Feature Visualisation Code
 6. Feature Importance Code:
 	Added The Code -> Make it to work with Command Line
 7. Extracting the heatmaps for each feature.
-
-9. Silhoutte Algorithm
 10. Clustering for patch selection
  -> code Added 
 13. Mean and Standard deviation of dataset: For Reinhard Normalization
@@ -64,11 +61,7 @@ from torchinfo import summary
 def parse():
 
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--mode',default = 'train',type = str)
-	parser.add_argument('--config',default = '',type = str)
-	# parser.add_argument('--batch_size_train',default = 8)
-	# parser.add_argument('--batch_size_test',default = 8 )
-	parser.add_argument('--gpus',default = [2])
+	parser.add_argument('config',default = '',type = str)
 	args = parser.parse_args()
 	return args
 
@@ -138,10 +131,8 @@ def main(cfg):
 
 
 	# lr_finder = trainer.tuner.lr_find(model,datamodule=data_module)
-
 	# # Results can be found in
 	# lr_finder.results
-
 	# # Plot with
 	# fig = lr_finder.plot(suggest=True)
 	# fig.savefig('/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/models/Learning_Rate.png')
@@ -150,39 +141,20 @@ def main(cfg):
 	# new_lr = lr_finder.suggestion()
 	# print(new_lr)
 
-
 	if cfg.General.mode == 'train':
 		trainer.fit(model = model,datamodule = data_module)
 	else:
-		fine_tuned_model_path = cfg.Model.fine_tuned_weights_dir
-		paths = list(fine_tuned_model_path.glob('*.ckpt'))
-		paths = [str(path) for path in paths if 'val' in str(path)]
-		for path in paths:
-			print('Using the {} for testing the model on dataset')
-
-			test_model = model.load_from_checkpoint(checkpoint_path=path)
-			trainer.test(test_model,datamodule = data_module)
+		print('Using the {} for testing the model on dataset')
+		test_model = model.load_from_checkpoint(checkpoint_path=cfg.General.weights_file_path)
+		trainer.test(test_model,datamodule = data_module)
 	
-
-
 
 if __name__ == '__main__':
 
-
 	args = parse()
-	config_file_path = '/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/config/bermanlab.yaml'
-	# config_file_path = args.config
+	# config_file_path = '/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/config/bermanlab.yaml'
+	config_file_path = args.config
 	cfg = read_yaml(config_file_path)
-	
-	# cfg = read_yaml(args.config)
-
-	#---> Updating configuration using command line for quick runs
-
-	cfg.General.gpus = args.gpus
-	cfg.General.mode = args.mode
-	# cfg.Data.test_dataloader.batch_size = args.batch_size_test
-	# cfg.Data.train_dataloader.batch_size = args.batch_size_train
-	
 
 	main(cfg)
 

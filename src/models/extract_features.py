@@ -55,12 +55,12 @@ class Tiles_Selected_CSV(Dataset):
     
     def __getitem__(self,index):
         image = Image.open(self.image_patches[index]).convert('RGB')
-        patch_name = self.image_patches[index].split('/')[-1]
+        # patch_name = self.image_patches[index].split('/')[-1]
         image_name = self.image_patches[index].split('/')[-2]
         label = self.labels_dict[int(((image_name).split(' ')[1]).split('.')[0])]
         image = self.transform(image)
 
-        return image,patch_name
+        return image,self.image_patches[index]
 
 
 def extract_features(model):

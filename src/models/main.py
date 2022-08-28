@@ -67,11 +67,11 @@ def parse():
 
 def main(cfg):
 
-	random_seed = cfg.General.seed
+	# random_seed = cfg.General.seed
 
 	#----> load loggers
 	wandb_logger = WandbLogger(name=cfg.General.run_name,project=cfg.General.project_name)
-	tb_logger = pl_loggers.TensorBoardLogger(save_dir=cfg.General.log_path)
+	# tb_logger = pl_loggers.TensorBoardLogger(save_dir=cfg.General.log_path)
 	
 
 	#----> Dataset And Interface Intitialization
@@ -112,9 +112,8 @@ def main(cfg):
 		
 	)
 
-	# # checkinpoint only when training
 
-	Mycallbacks = [callback_checkpoint]
+	Mycallbacks = [callback_checkpoint,early_stop_callback]
 
 
 	#----> Instantiate Trainer
@@ -124,27 +123,24 @@ def main(cfg):
 		devices = cfg.General.gpus,
 		max_epochs = cfg.General.epochs,
 		check_val_every_n_epoch = 1,
-		logger = [tb_logger,wandb_logger],
+		logger = [wandb_logger],
 		accumulate_grad_batches=cfg.General.grad_accumulation,
 		callbacks = Mycallbacks
 	)
 
 
-	# lr_finder = trainer.tuner.lr_find(model,datamodule=data_module)
-	# # Results can be found in
-	# lr_finder.results
-	# # Plot with
-	# fig = lr_finder.plot(suggest=True)
-	# fig.savefig('/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/models/Learning_Rate.png')
+	if cfg.General.mode == 'lr_find':
+		lr_finder = trainer.tuner.lr_find(model,datamodule=data_module)
+		lr_finder.results
+		fig = lr_finder.plot(suggest=True)
+		fig.savefig('/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/models/Learning_Rate.png')
+		new_lr = lr_finder.suggestion()
+		print(new_lr)
 
-	# # Pick point based on plot, or get suggestion
-	# new_lr = lr_finder.suggestion()
-	# print(new_lr)
-
-	if cfg.General.mode == 'train':
+	elif cfg.General.mode == 'train':
 		trainer.fit(model = model,datamodule = data_module)
-	else:
-		print('Using the {} for testing the model on dataset')
+
+	elif cfg.General.model == 'test':
 		test_model = model.load_from_checkpoint(checkpoint_path=cfg.General.weights_file_path)
 		trainer.test(test_model,datamodule = data_module)
 	

@@ -274,24 +274,26 @@ Project Organization
         |           ├── Tile_Exporter.groovy
         |           └── tile_scorer.py 
         ├── features       
-        │    ├── clustering_extracted_features.ipynb
         |    ├── feature_analysis.ipynb
         │    └── feature_importance.py
         |           
-        ├── models    <- Scripts to train models and then use trained models to make predictions
-        │   ├── architechture
-        |   ├── model architechture
-        |   |     └──kimianet_modified.py   <- Pytorch Lightning module for the model
-        │   ├── predict_model.py
-        │   └── train_model.py
-        │
-        └── visualization  <- Scripts to create Visual Dictionary Using Extracted Features After fine Tuning the Model
-               └── visualize.py
+        └── models    <- Scripts to train models and then use trained models to make predictions
+            ├── architechture
+            |     └──model_interface.py   <- Pytorch Lightning module for the model
+            ├── extract_features.py
+            └── main.py
+        
 
-            
-
+        
 --------
 
+### Papers to Cite:
+1. https://www.sciencedirect.com/science/article/pii/S1361841521000785 KimiNet
+2. https://ajp.amjpathol.org/article/S0002-9440(21)00387-4/fulltext kimiaNet Feature Visualization
+3. https://www.nature.com/articles/s41598-022-08974-8.pdf?origin=ppub Clustering on basis of Extracted Features
+
+
+To ADD : Gini Index Calculation for the Clustering Finally Done.
 
 ## Issues:
 - All issues reported on the forum of the repository

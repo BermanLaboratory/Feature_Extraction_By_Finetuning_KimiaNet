@@ -3,11 +3,11 @@ General:
     gpus: [2] #which GPUs to use for training the model. Use nvidia-smi to see available GPUs
     epochs: 15 # Number of Times To Run the dataset through the model for training
     patience: 10 
-    mode: train #train #test
+    mode: train #train #test #lr_find
     log_path: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/logs/ #Path to create Training Logs
     project_name: feature_extraction # Will be Used to Sync Wandb logs
     weights_file_path:                     # Which Model to Use while inference or Feature extraction
-    run_name: 500-Adam-0.0001-8-CopiesRemoved-GradAccum(64) # Name of the Latest Project Run -> will be the name of wandb run
+    run_name: 500-Adam-0.0001-8-GradAccum(64) # Name of the Latest Project Run -> will be the name of wandb run
     grad_accumulation: 8  # This will be used to simulate the Batch Size. New Batch Size : Batch Size * Grad_Accumulation
 Data:
     dataset_name: berman_lab_cohort

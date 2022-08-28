@@ -168,6 +168,12 @@ Arguments:
 
 ## Running The Model
 
+Setting Environment Variables
+export PYTHONPATH=$PYTHONPATH:<root module path>
+1. Src Module Path
+
+export WANDB_API_KEY 
+
 For Running the model on custom dataset
 Change the Yaml [config_file](/src/config/bermanlab.yaml) with appropriate parameters before running the script.
 The Yaml file can be used to change the mode from train to test.

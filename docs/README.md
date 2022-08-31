@@ -5,17 +5,32 @@ Finetuning DenseNet121 architechture using weights of the model provided by Kimi
 
 FineTuning:
 
-DenseNet121 Architechture
+DenseNet121 Architechture:
 
-pip install -r /path/to/requirements.txt
 
 ## Updates:
-
 
 ## Running External Cohorts on This Code
 
 ## Setup:
 
+
+Create a virtual environment to work. Install all the packages in that environment.
+* Use to following command to create a virtual environment:
+```shell
+python -m venv /path/to/new/virtual/environment
+```
+* To activate the venv:
+``` shell
+source PATH_TO_VENV/bin/activate
+```
+
+All the required packages can be found in requirements.txt file.
+Installation Using requirements.txt file:
+
+```shell
+pip install -r PATH_TO_REQUIREMENTS_FILE
+```
 
 
 ## Preprocessing Image Dataset (.vsi Images) :
@@ -172,11 +187,6 @@ Arguments:
 
 ## Running The Model
 
-Setting Environment Variables
-export PYTHONPATH=$PYTHONPATH:<root module path>
-1. Src Module Path
-
-export WANDB_API_KEY 
 
 For Running the model on custom dataset
 Change the Yaml [config_file](/src/config/bermanlab.yaml) with appropriate parameters before running the script.
@@ -190,6 +200,31 @@ python main.py --config CONFIG_FILE_PATH
 ```
 Arguments:
 * `config`: configuration file path
+
+All the Logs can be locally stored and visualized using tensorboard logger
+Or can be visualised using Wandb logger.
+Wandb description:
+To set up wandb:
+1. Add a new project to the wandb profile.
+2. The project name in the config Yaml file should be same as the project name on wandb platform.
+3. Set a Run Name before every run. The Run Name Usually includes the hyperparameters used and properties unique to the Run.
+4. If the login through command line does not work. Set up the environment variable using following command:
+```shell
+export WANDB_API_KEY:YOUR_API_KEY
+```
+The api key can be found in the settings of wandb profile.
+
+If there is a module not found error:
+Set the environment variable using following command:
+
+```shell
+export export PYTHONPATH=$PYTHONPATH:PATH_TO_SRC_FOLDER
+```
+
+## Post Training Pipeline:
+
+<img src="/docs/Post_Training_Pipeline.png"  height = '300px' width = '800px' align="center" />
+
 
 ## Feature Extraction
 Run the [extract_features.py](/src/models/extract_features.py) to extract features using the fine_tuned model for specific Patches.
@@ -206,8 +241,6 @@ Arguments:
 *The GPU to be used can be changed in the file itself.*
 
 
-
-
 ## Extracted Feature Analysis
 ### Feature Importance Calculation
 The Importance of Each Feature is calculated using Support Vector Machines.
@@ -222,6 +255,19 @@ Arguments:
 * `features`: Path of feature file to analyze
 * `labels`: Path to the Data CSV file with sample ids and labels.
 
+### PCA and TSNE visualization:
+PCA
+
+TSNE
+
+### Clustering Image Patches on Basis of Extracted Features
+This step helps to understand what patterns is the model trying to learn.
+
+
+### Deep Feature Visualization.
+
+
+
 ## General Commonalities Between The files
 Many of the scripts use python multiprocessing module to run multiple processes simultaneously to speed up the calculation.
 More Details regarding it's Use can be found at : [Python Multiprocessing](https://docs.python.org/3/library/multiprocessing.html)
@@ -230,24 +276,36 @@ For Running the Scripts from command line.
 Argparse has been used. 
 For every python script if `python script.py --help` will provide the details of all the arguments required with their description.
 
+## Using Screen on the Server:
+Why Use Screen?
+1. Using the Screen we can can run multiple sessions at once on the server.
+2. The sessions can be run in the background. If the connection with system breaks, the session still keeps running on the server.
+
+
+This [Article](https://linuxize.com/post/how-to-use-linux-screen/#:~:text=Basic%20Linux%20Screen%20Usage,-Below%20are%20the&text=On%20the%20command%20prompt%2C%20type,session%20by%20typing%20screen%20%2Dr%20.) has summarized the Use of Screen on Linux in a Great Way.
+
+Creating a new Screen Session.
+```shell
+screen -S NAME
+```
+
+Some Other Useful Commands:
+* `screen -ls`: List all the current running screen sessions.(It also shows attached and detached screens)
+* `screen -r NAME`: To attach to a screen with name as NAME.
+* Ctrl+a+d : To Detach from the screen.
+* `exit`: To detach and close a screen session.
+
 
 ## Handling Github
 data directory if empty add to source control
 if data added then using .gitignore file -> uncomment the line of /data/ to exclude it from being uploaded to github
 
-commiting:
-Pushing:
-Staging Commits etc
+To Save Changes to Github Repo:
+1. Stage Changes using `git add .`
+2. Commit Changes using `git commit -m COMMENT`
+3. Push using `git push origin master`
 
-requirement.txt file : creating this file pipreqs --savepath 
-use this command while in project directory
 
-installing using requirements file pip install -r requirements.txt
-
-Enivronment variables to set:
-Creating Virtual Environment
-Python Src set for the package.
-Installing the cuda packages depening on GPU
 
 Project Organization
 ------------
@@ -305,6 +363,7 @@ Project Organization
 
 3. Lee, J., Warner, E., Shaikhouni, S. et al. Unsupervised machine learning for identifying important visual features through bag-of-words using histopathology data from chronic kidney disease. Sci Rep 12, 4832 (2022).
 
+4. Boschman J, Farahani H, Darbandsari A, et al. The utility of color normalization for AI-based diagnosis of hematoxylin and eosin-stained pathology images. J Pathol. 2022;256(1):15-24. doi:10.1002/path.5797
 
 ## Issues:
 - All issues reported on the forum of the repository

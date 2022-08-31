@@ -14,6 +14,10 @@ pip install -r /path/to/requirements.txt
 
 ## Running External Cohorts on This Code
 
+## Setup:
+
+
+
 ## Preprocessing Image Dataset (.vsi Images) :
 
 <img src="/docs/WSI_Processing.png"  height = '700px' align="center" />
@@ -293,13 +297,14 @@ Project Organization
         
 --------
 
-### Papers to Cite:
-1. https://www.sciencedirect.com/science/article/pii/S1361841521000785 KimiNet
-2. https://ajp.amjpathol.org/article/S0002-9440(21)00387-4/fulltext kimiaNet Feature Visualization
-3. https://www.nature.com/articles/s41598-022-08974-8.pdf?origin=ppub Clustering on basis of Extracted Features
+## References:
 
+1. Riasatian, Abtin, et al. "Fine-tuning and training of densenet for histopathology image representation using tcga diagnostic slides." Medical Image Analysis 70 (2021): 102032.
 
-To ADD : Gini Index Calculation for the Clustering Finally Done.
+2. Dehkharghanian T, Rahnamayan S, Riasatian A, Bidgoli AA, Kalra S, Zaveri M, Babaie M, Sajadi MSS, Gonzalelz R, Diamandis P, Pantanowitz L, Huang T, Tizhoosh HR. Selection, Visualization, and Interpretation of Deep Features in Lung Adenocarcinoma and Squamous Cell Carcinoma. Am J Pathol. 2021;191:2172–83.
+
+3. Lee, J., Warner, E., Shaikhouni, S. et al. Unsupervised machine learning for identifying important visual features through bag-of-words using histopathology data from chronic kidney disease. Sci Rep 12, 4832 (2022).
+
 
 ## Issues:
 - All issues reported on the forum of the repository

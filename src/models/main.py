@@ -7,6 +7,7 @@ from data.data_interface import *
 #----> Helper Libraries
 import json
 import argparse
+import os
 
 #----> pytorch_lightning
 import pytorch_lightning as pl
@@ -19,44 +20,6 @@ from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 #----> torchinfo to find structure of model
 from torchinfo import summary
 
-
-
-'''Todo:
-3. Test the -> test Code.
-5. Feature Visualisation Code
-6. Feature Importance Code:
-	Added The Code -> Make it to work with Command Line
-7. Extracting the heatmaps for each feature.
-10. Clustering for patch selection
- -> code Added 
-13. Mean and Standard deviation of dataset: For Reinhard Normalization
-		Added in the Dataloader
-		Using Mean and Standard dev already given
-14. Add seaborn visualization code here
-15. Add Statistics Calculation to the code
-16. Learning Rate and Batch Size Optimizer
-		Learning Rate added -> Move it to utils file
-
-17. Add docstrings to all the functions in the code
-18. Write all the input and output of each file in the code.
-19. Add Python  Path addition to the code
-20. Description and use of each file with references and citation.
-21. Sample outputs add to the github page.
-22. Test Runs for all the code.
-23. Directory structure required to run the files
-23. Update the requirements file -> add that to readme as well
-24. Project Directory Readme complete
-25. What do you mean by fine tuning
-26. Yaml file description
-27. why pytorch lightning
-28. What is hyperparameter tuning and why?
-29. Short QuPath Videos
-30. Add capacity for n>2
-31. wandb connection check
-32. Table for all the files
-33. Python multiprocessing module -> info reference
-34. Using Screen for running stuff
-'''
 
 def parse():
 
@@ -133,7 +96,7 @@ def main(cfg):
 		lr_finder = trainer.tuner.lr_find(model,datamodule=data_module)
 		lr_finder.results
 		fig = lr_finder.plot(suggest=True)
-		fig.savefig('/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/models/Learning_Rate.png')
+		fig.savefig(os.path.join(cfg.Optimizer.lr_finder_path,'Learning_Rate.png'))
 		new_lr = lr_finder.suggestion()
 		print(new_lr)
 

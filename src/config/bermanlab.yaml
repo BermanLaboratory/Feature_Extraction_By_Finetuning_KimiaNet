@@ -1,14 +1,14 @@
 General:
     seed: 65 # To make process reproduceable . All Randomness is generated using this seed
     gpus: [2] #which GPUs to use for training the model. Use nvidia-smi to see available GPUs
-    epochs: 15 # Number of Times To Run the dataset through the model for training
+    epochs: 20 # Number of Times To Run the dataset through the model for training
     patience: 10 
     mode: train #train #test #lr_find
     log_path: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/logs/ #Path to create Training Logs
     project_name: feature_extraction # Will be Used to Sync Wandb logs
-    weights_file_path:                     # Which Model to Use while inference or Feature extraction
-    run_name: 500-Adam-0.0001-8-GradAccum(64) # Name of the Latest Project Run -> will be the name of wandb run
-    grad_accumulation: 8  # This will be used to simulate the Batch Size. New Batch Size : Batch Size * Grad_Accumulation
+    weights_file_path: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models/feature_extraction-epoch=13-val_loss=0.1608.ckpt                    # Which Model to Use while inference or Feature extraction
+    run_name: 500-Adam-0.0001-8-GradAccum(32)-freeze(1-2) # Name of the Latest Project Run -> will be the name of wandb run
+    grad_accumulation: 4  # This will be used to simulate the Batch Size. New Batch Size : Batch Size * Grad_Accumulation
 Data:
     dataset_name: berman_lab_cohort
     data_shuffle: True
@@ -38,12 +38,13 @@ Model:
     pretrained_weights: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models/KimiaNetPyTorchWeights.pth #Path to KimiaNet Weights File
     n_classes: 2 # Number Of Labels Being Used for Training. Currently Only Support for 2. will Add Option For Multiple Later
     fine_tuned_weights_dir: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models #Path to Save the Final Trained Models
-    layers_to_freeze: [] # [1,2,3,4] The Layers that are required to be frozen while finetuning the model. The Layers correspond to each dense block in the DenseNet
+    layers_to_freeze: [1,2] # [1,2,3,4] The Layers that are required to be frozen while finetuning the model. The Layers correspond to each dense block in the DenseNet
 
 Optimizer:
     opt: adam
     lr: 0.0001 #0.0001 # Check the Learning Rate Graph To See What Learning Rate to use
     weight_decay: 0.0001
+    lr_finder_path: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/models #only required when using lr_find mode
 
 Loss:
     loss : CrossEntropyLoss #Currently only one loss hardcoded. Will Add this option Later

@@ -1,11 +1,19 @@
 Feature Extractor
 ==============================
 
-Finetuning DenseNet121 architechture using weights of the model provided by KimiaNet for extracting features From Whole Slide Image Patches relevant to Cancer Grades
+*Finetuning DenseNet121 architechture using weights of the model provided by KimiaNet for extracting features From Whole Slide Image Patches relevant to Cancer Grades*
 
-FineTuning:
 
-DenseNet121 Architechture:
+Transfer Learning is the approach in which we train models on one dataset (in a specific domain) and use those trained models to make inferences on a different dataset(in another domain).Fine Tuning is a form of transfer Learning. The Models Like DenseNet have a lot of layers in them. The Initial Layers are usually good at extracting general information from the images. This information is generally relevant to multiple domains and can be utilized by the final layers.While Fine Tuning a pre-trained model, some layers may be frozen to retain their weights. The weights of the final layers are changed while training the model on a new dataset. This helps to transfer the knowledge learned from one domain to other. Fine Tuning is beneficial in cases where datasets available to a specific domain are relatively small.
+
+Changes to original Architecture of the model are generally required for fine Tuning. The fully connected head to the model is modified per the new domain's requirements. The number of categories/classes are usually different in the target dataset than the dataset on which the model was pretrained.
+
+DenseNet121:
+All The Layers are 'Densely' connected. Every Layer in the model receives inputs from all previous layers. Dense Net has the best image representations. It has also overcome vanishing-gradient problem.
+It consists basically of 4 Dense Blocks. While Fine Tuning on the Custom Datasets Each Dense Block may be frozen or un-frozen while training.
+A great explanation to Dense Net's Architechture can be found at [this link](https://amaarora.github.io/2020/08/02/densenets.html)
+
+Torchvision provides already pretrained DenseNet models. The models are pre trained on *ImageNet* Dataset.
 
 
 ## Updates:
@@ -13,7 +21,6 @@ DenseNet121 Architechture:
 ## Running External Cohorts on This Code
 
 ## Setup:
-
 
 Create a virtual environment to work. Install all the packages in that environment.
 * Use to following command to create a virtual environment:
@@ -223,7 +230,7 @@ export export PYTHONPATH=$PYTHONPATH:PATH_TO_SRC_FOLDER
 
 ## Post Training Pipeline:
 
-<img src="/docs/Post_Training_Pipeline.png"  height = '300px' width = '800px' align="center" />
+<img src="/docs/Post_Training_Pipeline.png"  height = '300px' width = '500px' align="center" />
 
 
 ## Feature Extraction
@@ -242,6 +249,7 @@ Arguments:
 
 
 ## Extracted Feature Analysis
+All This Analysis should be done on the features extracted for Test Dataset.
 ### Feature Importance Calculation
 The Importance of Each Feature is calculated using Support Vector Machines.
 
@@ -255,17 +263,32 @@ Arguments:
 * `features`: Path of feature file to analyze
 * `labels`: Path to the Data CSV file with sample ids and labels.
 
-### PCA and TSNE visualization:
-PCA
+### PCA and t-SNE visualization:
+PCA and TSNE are both dimensionality reduction techniques. t-SNE is a probabilistic method. Scikit-Learn has implementations for both that can be utilized. 
+These Techniques help us to visualize how the dataset are distributed. The Features extracted from the trained model should have very clear clustering in the visualizations. The feature vectors are then transformed to a new lower dimensional space for further downstream analysis.
+*t-SNE and PCA help us to understand the discimination powers of the trained model.*
 
-TSNE
+[This File](src/features/feature_analysis.ipynb) has the code for t-SNE and PCA visualization on the extracted features.
+Two paths need to be specified before running the cells:
+1. The Extracted Features File Path.
+2. The Path to Labels CSV file
+
 
 ### Clustering Image Patches on Basis of Extracted Features
-This step helps to understand what patterns is the model trying to learn.
+This step helps to understand what patterns the model is trying to learn.
+The Clusters formed can be correlated to various features. K means is used for clustering the patches based on extracted features.  A visual representation of each cluster helps in Identification of histopathologically meaningful Features that each cluster corresponds to.
 
+-- Add Gini Index Calcluation to the code
+-- Code To Overlay The Clusters on the complete whole slide.
 
 ### Deep Feature Visualization.
+The Deep Features Which Show the highest importance ( highest accuracy) are further analyzed. Visualization techniques may help us to better understand the patterns assoicated with each deep features.
 
+Patch Level heatmaps:
+The 31 x 31 convolutional layer corresponding to each deep feature can be used to create patch level heatmaps.
+
+-- Add P -value test
+-- Deep Feature Visualization at whole slide level.
 
 
 ## General Commonalities Between The files
@@ -311,7 +334,7 @@ Project Organization
 ------------
 
     ├── LICENSE
-    ├── README.md          <- The top-level README for developers using this project.
+    ├── README.md          
     ├── data
     │   ├── final_dataset       <- Final Selected Patches After Nuclei Ratio/ Tissue Ratio Calculation
     │   ├── stain_norm_dataset  <- Tiles/Patches with Stain Normalization Done
@@ -324,15 +347,16 @@ Project Organization
     │
     ├── requirements.txt   <- Python Package requirements file -  generated with pipreqs
     │                        
-    └── src                <- Source code for use in this project.
-        ├── __init__.py    <- Makes src a Python module
+    └── src                <- Source Code for the Project
+        ├── __init__.py    <- makes src a python module
         │
         |
         ├── config
-        |    └──bermanlab.yaml  <- configurations for training and testing the model
+        |    └──bermanlab.yaml  
         |
-        ├── data           <- Scripts to transform data , dataloaders , dataset classes
+        ├── data                
         │    └──data_preprocessing
+        |           ├── __init__.py 
         |           ├── cluster_dataset.ipynb
         |           ├── fast_feature_extraction.py
         |           ├── mean_std_cal.py
@@ -341,17 +365,22 @@ Project Organization
         |           ├── stain_normalization.py
         |           ├── Tile_Exporter.groovy
         |           └── tile_scorer.py 
-        ├── features       
+        ├── features
+        |    ├── __init__.py        
         |    ├── feature_analysis.ipynb
         │    └── feature_importance.py
         |           
-        └── models    <- Scripts to train models and then use trained models to make predictions
-            ├── architechture
-            |     └──model_interface.py   <- Pytorch Lightning module for the model
-            ├── extract_features.py
-            └── main.py
+        ├── models                   
+        |   ├── architechture
+        |   |     ├── __init__.py 
+        |   |     └──model_interface.py   <- Pytorch Lightning module for the model
+        |   ├── extract_features.py
+        |   └── main.py
+        |
+        └──utils
+            ├── __init__.py 
+            └──utils.py    <- Contains all the utility functions used in the project. 
         
-
         
 --------
 

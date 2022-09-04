@@ -51,6 +51,7 @@ class model_interface(pl.LightningModule):
         self.learning_rate = learning_rate 
         self.train_accuracy = torchmetrics.Accuracy() 
         self.val_accuracy = torchmetrics.Accuracy()
+        self.test_accuracy = torchmetrics.Accuracy()
 
         self.criterion_train = nn.CrossEntropyLoss()
         self.criterion_val = nn.CrossEntropyLoss()
@@ -85,6 +86,13 @@ class model_interface(pl.LightningModule):
         self.log('val_acc', self.val_accuracy,on_step = True,on_epoch = True,prog_bar = True)
         self.log('val_loss', val_loss,on_step = True,on_epoch = True)
 
+    def test_step(self,batch,batch_index):
+
+        test_data,test_label = batch
+        temp, test_output = self.forward(test_data)
+
+        self.test_accuracy(test_output,test_label)
+        self.log('test_acc',self.test_accuracy,on_step = True,on_epoch = True)
 
     def configure_optimizers(self):
         

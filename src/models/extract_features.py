@@ -18,10 +18,10 @@ import argparse
 os.environ['CUDA_VISIBLE_DEVICES'] = '0' 
 
 parser = argparse.ArgumentParser(description='Script for Feature Extraction From A Trained Model')
-parser.add_argument("save_add",help = 'Path of Directory where to store the extracted features. Add '/' at the end')
+parser.add_argument("save_add",help = 'Path of Directory where to store the extracted features')
 parser.add_argument('model_weights',help= 'Path of the checkpoint file containing model weights')
 parser.add_argument('config',help = 'Path to the config file')
-parser.add_argument('selected',help = 'Path to csv file that contains paths of images whose features are to be extracted')
+parser.add_argument('selected',help = 'Path to json file that contains paths of images whose features are to be extracted')
 args = parser.parse_args()
 config = vars(args)
 
@@ -57,7 +57,9 @@ def extract_features(model):
 
     feature_dict = {}   
     # count = 0
+    print('Starting Feature Extraction')
     for ii, (inputs, img_name) in enumerate(dataloader):
+        print(ii)
         inputs = inputs.to(device)
         output1, output_2 = model(inputs)
         # count = count +1
@@ -66,7 +68,8 @@ def extract_features(model):
         for j in range(len(output_features)):
             feature_dict[img_name[j]] = output_features[j]
         # print(len(feature_dict))
-    save_file = open(save_address+'FineTuned_Model_Features_dict.pickle','wb')
+    final_save_address = os.path.join(save_address,'FineTuned_Model_Features_dict.pickle')
+    save_file = open(final_save_address,'wb')
     pickle.dump(feature_dict, save_file)
     save_file.close() 
 

@@ -54,7 +54,7 @@ def main(cfg):
 	
 	#-----> Model Checkpoint
 	
-	callback_checkpoint = ModelCheckpoint(
+	checkpoints_callback = ModelCheckpoint(
 		monitor = 'val_loss',
 		dirpath=cfg.Model.fine_tuned_weights_dir,
 		filename='feature_extraction-{epoch:02d}-{val_loss:0.4f}',
@@ -68,7 +68,7 @@ def main(cfg):
 
 	early_stop_callback = EarlyStopping(
 		monitor = 'val_loss',
-		patience = 5,
+		patience = cfg.General.patience,
 		min_delta = 0.00,
 		verbose = True,
 		mode = 'min'
@@ -76,7 +76,10 @@ def main(cfg):
 	)
 
 
-	Mycallbacks = [callback_checkpoint,early_stop_callback]
+	callbacks = [early_stop_callback]
+	if cfg.General.mode == 'train':
+		callbacks.append(checkpoints_callback)
+
 
 
 	#----> Instantiate Trainer
@@ -88,7 +91,7 @@ def main(cfg):
 		check_val_every_n_epoch = 1,
 		logger = [wandb_logger],
 		accumulate_grad_batches=cfg.General.grad_accumulation,
-		callbacks = Mycallbacks
+		callbacks = callbacks
 	)
 
 
@@ -103,8 +106,8 @@ def main(cfg):
 	elif cfg.General.mode == 'train':
 		trainer.fit(model = model,datamodule = data_module)
 
-	elif cfg.General.model == 'test':
-		test_model = model.load_from_checkpoint(checkpoint_path=cfg.General.weights_file_path)
+	elif cfg.General.mode == 'test':
+		test_model = model.load_from_checkpoint(checkpoint_path=cfg.General.weights_file_path,kimianet_weights = cfg.Model.pretrained_weights,learning_rate= cfg.Optimizer.lr)
 		trainer.test(test_model,datamodule = data_module)
 	
 

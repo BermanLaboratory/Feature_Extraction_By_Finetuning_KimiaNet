@@ -172,7 +172,11 @@ def data_sampler_dict(split_type,indices,random_seed,len_dataset,patch_labels_li
     train_sampler = SubsetRandomSampler(train_indices)
     valid_sampler = SubsetRandomSampler(val_indices)
     test_sampler = SubsetRandomSampler(test_indices)
+
+    
+
     sampler = {'train':train_sampler,'val':valid_sampler,'test':test_sampler}
+
 
     return sampler
 

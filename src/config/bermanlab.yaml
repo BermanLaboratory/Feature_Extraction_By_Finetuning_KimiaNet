@@ -2,23 +2,25 @@ General:
     seed: 65 # To make process reproduceable . All Randomness is generated using this seed
     gpus: [2] #which GPUs to use for training the model. Use nvidia-smi to see available GPUs
     epochs: 20 # Number of Times To Run the dataset through the model for training
-    patience: 10 
-    mode: train #train #test #lr_find
+    patience: 2 # Number of epochs without improvement after which training will be early stopped 
+    mode: test #train #test #lr_find
     log_path: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/logs/ #Path to create Training Logs
     project_name: feature_extraction # Will be Used to Sync Wandb logs
-    weights_file_path: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models/feature_extraction-epoch=13-val_loss=0.1608.ckpt                    # Which Model to Use while inference or Feature extraction
-    run_name: 500-Adam-0.0001-8-GradAccum(32)-freeze(1-2) # Name of the Latest Project Run -> will be the name of wandb run
+    weights_file_path: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models/feature_extraction-epoch=19-val_loss=0.1495.ckpt                    # Which Model to Use while inference or Feature extraction
+    run_name: testing_model # Name of the Latest Project Run -> will be the name of wandb run
     grad_accumulation: 4  # This will be used to simulate the Batch Size. New Batch Size : Batch Size * Grad_Accumulation
 Data:
     dataset_name: berman_lab_cohort
     data_shuffle: True
     data_dir: /mnt/largedrive0/katariap/feature_extraction/data/Dataset/Images_Tiled  #Path to Directory With Image Tiles
     label_dir: /mnt/largedrive0/katariap/feature_extraction/data/Dataset/Data.csv # Path to csv file WSI Labels Binarized (0 or 1)
-    selected_patches_json: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/data/selected_tiles/selected_clustering_500_final.json #Path to CSV file that contains final selected Tiles for Training
+    selected_patches_json: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/data/selected_tiles/selected_clustering_500_final.json #Path to Json file that contains final selected Tiles for Training
     train_split: 0.8 #Dataset Split
     validation_split: 0.1 
     test_split: 0.1
     split_type: balanced #balanced #random
+    split_test: True # Is a test split required or not
+    custom_test_selected_patches_json:
     target_stain: /mnt/largedrive0/katariap/feature_extraction/data/Dataset/Images_Tiled/Sample 197.vsi - 20x/Sample 197.vsi - 20x [x=24000,y=34000,w=1000,h=1000].png
 
     train_dataloader:
@@ -38,7 +40,7 @@ Model:
     pretrained_weights: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models/KimiaNetPyTorchWeights.pth #Path to KimiaNet Weights File
     n_classes: 2 # Number Of Labels Being Used for Training. Currently Only Support for 2. will Add Option For Multiple Later
     fine_tuned_weights_dir: /mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models #Path to Save the Final Trained Models
-    layers_to_freeze: [1,2] # [1,2,3,4] The Layers that are required to be frozen while finetuning the model. The Layers correspond to each dense block in the DenseNet
+    layers_to_freeze: [1,2,3] # [1,2,3,4] The Layers that are required to be frozen while finetuning the model. The Layers correspond to each dense block in the DenseNet
 
 Optimizer:
     opt: adam
@@ -48,3 +50,8 @@ Optimizer:
 
 Loss:
     loss : CrossEntropyLoss #Currently only one loss hardcoded. Will Add this option Later
+
+Feature_Extraction:
+    save_address:
+    model_weights_path:
+    patches_csv_path:

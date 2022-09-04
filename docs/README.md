@@ -225,7 +225,7 @@ If there is a module not found error:
 Set the environment variable using following command:
 
 ```shell
-export export PYTHONPATH=$PYTHONPATH:PATH_TO_SRC_FOLDER
+export PYTHONPATH=$PYTHONPATH:PATH_TO_SRC_FOLDER
 ```
 
 ## Post Training Pipeline:

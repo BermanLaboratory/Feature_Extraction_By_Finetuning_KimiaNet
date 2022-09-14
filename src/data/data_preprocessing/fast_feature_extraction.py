@@ -6,7 +6,7 @@ from PIL import Image
 import json
 import argparse
 
-parser = argparse.ArgumentParser(description='Script to extract features from using pretrained densenet on ImageNet -> Generates a json file for each wsi with features of all patches from a wsi')
+parser = argparse.ArgumentParser(description='Script to extract features using pretrained densenet on ImageNet -> Generates a json file for each wsi with features of all patches from a wsi')
 parser.add_argument("src",help = 'Dataset Source')
 parser.add_argument('dst',help='Destination Folder to store the Extracted Features')
 args = parser.parse_args()
@@ -37,7 +37,7 @@ def image_feature_extractor(path_tiled,img2vec,dst_path):
     
     print("Feature Extraction for Image {} Done! ".format(path_tiled))
 
-    # print(len(feature_dictionary))
+    
     file_name = path_tiled.split('/')[-1] + '_feature_vectors_densenet.json'
 
     # Save The Final Dictionary As Json file

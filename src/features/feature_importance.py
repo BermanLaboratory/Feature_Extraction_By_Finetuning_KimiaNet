@@ -62,7 +62,6 @@ def feature_analyzer(i,df_final,return_dict):
 
     score = accuracy_score(y_test,y_pred)
 
-    # result_list[i] = score
     if score > 0.6:
         print(score, i)
         
@@ -79,9 +78,8 @@ if __name__ == '__main__':
     labels_csv = config['labels']
 
     starttime = time.time()
-    # df = read_file('/mnt/largedrive0/katariap/feature_extraction/data/Dataset/kimianet_features/FineTuned_Model_Features_dict.pickle')
+   
     df = read_file(feature_file)
-    # labels_dict = dataset_labels('/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Data.csv')
     labels_dict = dataset_labels(labels_csv)
 
     df['Grade'] = ""
@@ -94,11 +92,7 @@ if __name__ == '__main__':
         label_list = label_list + [label]
 
     df['Grade'] = label_list
-    # df.to_csv('/mnt/largedrive0/katariap/feature_extraction/data/Dataset/kimianet_features/features.csv')
-    # df_final = df
-    
-    # accuracy_list = []
-    # feature_number = []
+  
 
     result_df = pd.DataFrame()
     processes = []
@@ -116,8 +110,6 @@ if __name__ == '__main__':
         process.join()
 
     print('That took {} seconds'.format(time.time() - starttime))
-    # print(len(return_dict))
-    # print(result_list[0])
     result_df = pd.DataFrame((return_dict.values()),columns=['Accuracy'])
     print('Saving The Dataframe')
 

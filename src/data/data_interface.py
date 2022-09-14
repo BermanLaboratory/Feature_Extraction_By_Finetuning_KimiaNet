@@ -32,6 +32,7 @@ class WSI_Data_Interface(pl.LightningDataModule):
         if self.cfg.split_test == False:
             with open(self.cfg.custom_test_selected_patches_json, 'r') as f:
                 self.selected_test = json.load(f)
+                
         #Setup Train, Test And Val Dataset Objects
         # Not an ideal way to setup datasets. Doing This way because different transforms are required to be applied to different dataset splits.
 

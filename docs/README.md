@@ -23,6 +23,7 @@ Torchvision provides already pretrained DenseNet models. The models are pre trai
 ## Setup:
 
 Create a virtual environment to work. Install all the packages in that environment.
+
 * Use to following command to create a virtual environment:
 ```shell
 python -m venv /path/to/new/virtual/environment
@@ -33,7 +34,7 @@ source PATH_TO_VENV/bin/activate
 ```
 
 All the required packages can be found in requirements.txt file.
-Installation Using requirements.txt file:
+Installation of required Packages Using requirements.txt file:
 
 ```shell
 pip install -r PATH_TO_REQUIREMENTS_FILE
@@ -53,8 +54,8 @@ pip install -r PATH_TO_REQUIREMENTS_FILE
 [QuPath Script Link](/src/data/data_preprocessing/Tile_Exporter.groovy)
 The Script is also Present in the Backup Drive to Run it Directly on the dataset.
 
-Tiling Parameters in the Script That Can be Changed: 
-* `downsample`: This parameters helps to select the resolution we want to work with. By default set to 1. Means max resolution of the file that is 20X. The final resoultion of image will be `orginial max resolution / downsample`
+Tiling Parameters in the Script that can be Changed: 
+* `downsample`: This parameter helps to select the resolution we want to work with. By default set to 1, meaning max resolution of the file that is 20X. The final resolution of image will be `orginial max resolution / downsample`
 * `imageExtension`: '.png' is default . It is a lossless compression format. '.tiff' is good but it uses lot more memory for storage.
 * `tileSize`: specify the size of tiles to use. (default: 1000)
 * `overlap`: how much do you want tiles to overlap (default: 0)
@@ -70,7 +71,7 @@ Right Click on the Script Editor of Qupath: * Choose 'Run' For A single WSI
 
 This is done using the file size of the created image patches. The python script will run directly by just using the dataset folder and file size using command line.
 Default value for file size for 1000 pixel .png images is : 1 mb.
-The File Size can be determined by sorting the patches based on file size using file explorer and then determine the appropriate threshold.
+The threshold file size can be determined by sorting the patches based on file size using file explorer and then determine the appropriate threshold.
 
 [Remove Empty Tile Script](src/data/data_preprocessing/remove_empty_tiles.py)
 
@@ -144,7 +145,8 @@ Using This approach The following artifacts can be easily removed from the datas
 
 
 ### Patch/Tile Score Calculation 
-Score Can be calculated by just taking into consideration the number of nuclei or by using the histolab's implementation of tissue ratio plus the nuclei ratio.
+Score Can be calculated by just taking into consideration the number of nuclei or by using the [histolab's](https://histolab.readthedocs.io/en/latest/api/scorer.html) implementation of tissue ratio plus the nuclei ratio.
+For just nuclei ratio calculation [HistomicsTK](https://digitalslidearchive.github.io/HistomicsTK/) has been used for color deconvulation.
 
 [Tile Scorer Script](/src/data/data_preprocessing/tile_scorer.py)
 
@@ -159,13 +161,15 @@ python tile_scorer.py DATASET_PATH DESTINATION_PATH --type nuclei_and_tissue
 ```
 
 ### Final Selection of Patches 
-The Top Patches are finally selected On Basis of the Tile Scores and the results of clustering.
+The Top Patches are finally selected On Basis of the Tile Scores and the results of clustering(Artifact Removal).
 [select_patches](/src/data/data_preprocessing/select_patches.py)
 
+The Number of Patches is hard coded in the file itself (top 500 by default). This can be changed in the file. Not provided it as command line argument to prevent unwanted errors downstream.
+
 Arguments for the sript:
-* `cluster` : Path to File with selected Patches after clustering
+* `cluster` : Path to File with selected Patches after clustering(Artifact Removal)
 * `patch_score`: Path to Directory That contains patch score files
-* `dst`: The Path to store the final json file. Path format : directory/file_name.json'
+* `dst`: The Path to store the final json file. Path format : directory/file_name.json'. 
 
 Sample Command For Running The Script:
 ```shell
@@ -177,7 +181,7 @@ python select_patches.py CLUSTERING_RESULT_FILE PATCH_SCORE_FOLDER DST_FILE_PATH
 Stain Normalization Can Either be Done dynamically when loading images to the deep learning model or creating by creating a completely new dataset.
 Reinhard, Vahadne, Macenko methods are being used for stain normalization. The implementations of these methods by [HistomicsTk](https://digitalslidearchive.github.io/HistomicsTK/) and [StainTools](https://github.com/Peter554/StainTools) have been used.
 
-The Patches can be normalized using a standard patch or using mean and sd for the target color space.
+The Patches can be normalized using a standard patch or using mean and standard deviation for target image space. 
 
 Sample Command
 ```shell
@@ -189,6 +193,7 @@ Arguments:
 * `--type`: Type of normalization to use. using mean_and_std or a reference image
 * `--standard`: Path to the image to be used as a reference for normalization.
 
+
 *If Stain Normalization is to be Done Dynamically while loading images to the model. Check The tiles_dataset.py for instructions.*
 
 
@@ -197,9 +202,81 @@ Arguments:
 
 For Running the model on custom dataset
 Change the Yaml [config_file](/src/config/bermanlab.yaml) with appropriate parameters before running the script.
-The Yaml file can be used to change the mode from train to test.
 
-Pytorch Lightning:
+
+The code for models is written using [Pytorch Lightning](https://www.pytorchlightning.ai/). This framework is build upon pytorch. 
+This framework helps to make pytorch code more structured. As the boilerplate code is handled by lightning, changing parameters and running experiments becomes much more easier.
+Pytorch Lightning has great [documentation](https://pytorch-lightning.readthedocs.io/en/latest/). In case any customization is required for the code, the documentation would be a great resource to start with.
+
+Configuration Yaml File Description:
+
+The Major Setting For the Config File is the mode in which model is to be Run:
+For our case it has three modes:
+1. train : Training the Model on Custom Dataset
+2. test : Testing the model
+3. lr_finder : Finding Learning Rate to train the model
+
+Each Parameter has a tag associated with it (train, test or lr_find). This will tell which parameters are required for training, testing or for running  lr_find
+The description also mentions the the source of parameter (From where the parameters can be generated and retreived)
+
+The dataset can be split into train, val and test. A separate Test data can also be used as per requirements.
+
+```yaml
+General:
+    seed: # This Seed Will be Used to Generate All the randomness in the pipeline. Necessary for reproduction purposes. (all modes)
+    gpus: # Which GPU to use for running the model. Use nvidi-smi to check for ideal GPUs. (all modes)
+    epochs: # Number of times to pass the dataset through model for training (train)
+    patience:  # Number of epochs without improvement after which training will be early stopped (train)
+    mode: # train ,test or lr_find
+    log_path: # Path to store the training logs (train)
+    project_name: # Required for wandb logger ( all modes)
+    weights_file_path: # Path to the fine-tuned model weights file (.ckpt file). This file will be generated after training of model is complete. Can be found in the models folder or the path specified in fine_tuned_weights_dir (test)
+    run_name: # This will be the name of the log synced with wandb. Use Unique names for each run to keep track of parameters changed, experiments done etc. (all modes)
+    grad_accumulation: # This will be used to simulate larger batch sizes. New Batch Size : Batch Size * Grad_Accumulation (train)
+Data:
+    dataset_name: # Just to keep track on which dataset the model is being run
+    data_shuffle: # To Shuffle the dataset while loading into the model or not (train)
+    data_dir: # Path to the Tiled Dataset Directory. The Tiled Dataset is generated from the above preprocessing steps.(all modes)
+    label_dir: # Path to the CSV file that Contains Labels associated with each sample id.(Columns: Sample ID and Sample Grade). The grades are binarized to 0 and 1.(all modes)
+    selected_patches_json: # Path to Json file that contains final selected Tiles. Generated after running select_patches.py script (Final Tiles Selection). (all modes)
+    train_split: # Training Split Ratio
+    validation_split: # Validation Split
+    test_split: # Test Split
+    split_type: # The splits can have two modes : Random or Balanced. Balanced modes distributes tiles on basis of labels. (equal split)
+    split_test: # Is the Test Split of Current Dataset required or Not. If False then a separate test dataset can be used. (all modes)
+    custom_test_selected_patches_json: # only required when split_test is False. Path to the selected json file after preprocessing for the separate test dataset
+    target_stain: # Path to the image to which tiles are to be stain normalized to. (Not Required). Feature is development
+
+    train_dataloader:
+        batch_size: 
+        num_workers: # Number of CPUs that can be used to laod the dataset to the model
+
+    test_dataloader:
+        batch_size: 
+        num_workers: 
+
+    val_dataloader:
+        batch_size:
+        num_workers: 
+
+Model:
+    name: 
+    pretrained_weights: # Path to the kimianet pretrained weights. (all modes)
+    n_classes: # As of now only 2 works. Running the model on more dataset that has more than two classes will require extensive modifications to the code. (all modes)
+    fine_tuned_weights_dir: # Path to the directory where to store the weights of the trained model.(train)
+    layers_to_freeze: # Dense Net has 4 Dense Blocks. Specify as a list which DenseNet blocks are to be frozen while fine-tuning.(train)
+
+Optimizer:
+    opt: adam
+    lr: # Specify the Learning Rate to run model with (train)
+    weight_decay: 
+    lr_finder_path: # if mode is lr_find then specify the path to store it's results (lr_find)
+
+Loss:
+    loss : # Loss function to Use. As of now only one hard coded in the project (CrossEntropy Loss). Can be changed in model_interface.py file (change the criterion_train and val as per requirement)
+
+```
+
 
 ```shell
 python main.py --config CONFIG_FILE_PATH 
@@ -240,7 +317,7 @@ Sample Command
 python extract_features.py SAVE_ADD MODEL_WEIGTHS CONFIG SELECTED
 ```
 Arguments:
-* `save_add`: Path of Directory Where to store the Extracted Features (Add / after the path)
+* `save_add`: Path of Directory Where to store the Extracted Features 
 * `model_weights`: Path to weights file to use for feature extraction
 * `config`: Path to the model configuration File
 * `selected`: Path to CSV file that contains the List of Paths of Patches whose features are required to be extracted.
@@ -278,16 +355,26 @@ Two paths need to be specified before running the cells:
 This step helps to understand what patterns the model is trying to learn.
 The Clusters formed can be correlated to various features. K means is used for clustering the patches based on extracted features.  A visual representation of each cluster helps in Identification of histopathologically meaningful Features that each cluster corresponds to.
 
+
+#### The Clusters can be overlayed on a single whole slide for understanding macro patterns:
+1. The whole slide image is required in an format supported by [openslide](https://openslide.org/formats/)
+2. For the .vsi images : Convert them to tiff. The files can be converted to .tiff using Qupath (File -> Export Images -> Original Pixels -> .tiff Format -> Downscale Factor = 10.)
+3. If the original files are downscaled. Specify the downscale factor in the code itself.
+4. Specify the sample id of the whole slide image.
+
+The Code for Visualization has been adapted from [CLAM](https://github.com/mahmoodlab/CLAM)
+
 -- Add Gini Index Calcluation to the code
--- Code To Overlay The Clusters on the complete whole slide.
 
 ### Deep Feature Visualization.
-The Deep Features Which Show the highest importance ( highest accuracy) are further analyzed. Visualization techniques may help us to better understand the patterns assoicated with each deep features.
+The Deep Features Which Show the highest importance (highest accuracy) are further analyzed. Visualization techniques may help us to better understand the patterns associated with each deep feature. The Feature with highest importance are determined using the results from the [Feature Importance Calculation](#feature-importance-calculation).
 
 Patch Level heatmaps:
-The 31 x 31 convolutional layer corresponding to each deep feature can be used to create patch level heatmaps.
+The 31 x 31 convolutional layer corresponding to each deep feature can be used to create patch level heatmaps. This [paper](https://www.sciencedirect.com/science/article/pii/S0002944021003874) used this approach to visualize the inner workings of the model.
 
--- Add P -value test
+*This Code is not working on the server because of old Cuda versions. This portion of the code can be run on the google colab.*
+
+
 -- Deep Feature Visualization at whole slide level.
 
 
@@ -320,14 +407,12 @@ Some Other Useful Commands:
 
 
 ## Handling Github
-data directory if empty add to source control
-if data added then using .gitignore file -> uncomment the line of /data/ to exclude it from being uploaded to github
+If Data is added to data directory then using .gitignore file -> uncomment the line of /data/ to exclude it from being uploaded to github
 
 To Save Changes to Github Repo:
 1. Stage Changes using `git add .`
 2. Commit Changes using `git commit -m COMMENT`
 3. Push using `git push origin master`
-
 
 
 Project Organization
@@ -393,6 +478,8 @@ Project Organization
 3. Lee, J., Warner, E., Shaikhouni, S. et al. Unsupervised machine learning for identifying important visual features through bag-of-words using histopathology data from chronic kidney disease. Sci Rep 12, 4832 (2022).
 
 4. Boschman J, Farahani H, Darbandsari A, et al. The utility of color normalization for AI-based diagnosis of hematoxylin and eosin-stained pathology images. J Pathol. 2022;256(1):15-24. doi:10.1002/path.5797
+
+5. Lu, M.Y., Williamson, D.F.K., Chen, T.Y. et al. Data-efficient and weakly supervised computational pathology on whole-slide images. Nat Biomed Eng 5, 555–570 (2021). https://doi.org/10.1038/s41551-020-00682-w
 
 ## Issues:
 - All issues reported on the forum of the repository

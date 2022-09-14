@@ -3,7 +3,7 @@ import pandas as pd
 import json
 import argparse
 
-parser = argparse.ArgumentParser(description='Select The Final Dataset for Training on Basis of Patch Score and Patches That removed after clustering')
+parser = argparse.ArgumentParser(description='Select The Final Dataset for Training on Basis of Patch Score and the results of patch clustering(artifact removal)')
 parser.add_argument("cluster",help = 'Path to csv file that has patches selected after clustering and removing patches with artifacts')
 parser.add_argument('patch_score',help = 'Path to the directory that contains the patch score calculated files')
 parser.add_argument('dst',help = 'The Path to store the final json file. Path format : directory/file_name.json')
@@ -28,11 +28,6 @@ def selected_patches(selected_csv_folder):
     
     return selected
 
-# image_patches = glob('/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Images_Tiled'+'/**/*.png',recursive = True)
-# selected = selected_patches('/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Nuclei_Ratio_180')
-# image_patches = [patch for patch in image_patches if patch.split('/')[-1] in selected]
-# with open("/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/data/selected_1000_180_with_new.json", 'w') as f:
-#     json.dump(image_patches, f, indent=2) 
 
 def select_patches_cluster_nuclei_ratio(cluster_selected,nuclei_ratio_folder):
 
@@ -61,9 +56,6 @@ def select_patches_cluster_nuclei_ratio(cluster_selected,nuclei_ratio_folder):
     return selected
 
 
-# selected = select_patches_cluster_nuclei_ratio('/mnt/largedrive0/katariap/feature_extraction/data/Dataset/selected_after_clustering.csv','/mnt/largedrive0/katariap/feature_extraction/data/Dataset/Nuclei_Ratio_histolab')
-# with open("/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/data/selected_clustering_500_final.json", 'w') as f:
-#     json.dump(selected, f, indent=2) 
 
 if __name__ == '__main__':
 

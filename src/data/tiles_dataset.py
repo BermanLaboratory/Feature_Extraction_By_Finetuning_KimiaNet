@@ -14,12 +14,12 @@ class Tiles_Selected_CSV(Dataset):
     def __init__(self,data_path,transform,labels_dict,selected_patches):
         """
 
-        Use this dataset class when the Selected Patches were in the form of a CSV File
+        Use this dataset class when the Selected Patches were in the form of a CSV or JSON file
 
         Args: 
             data_path : path to input dataset
             transform : transformation function
-            selected_patches: list of selected_patches with their file paths
+            selected_patches: list of selected_patches(file_paths)
             labels_dict : labels associated with each whole slide
         """
         self.data_path = data_path

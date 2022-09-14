@@ -1,6 +1,6 @@
 General:
     seed: 65 # To make process reproduceable . All Randomness is generated using this seed
-    gpus: [2] #which GPUs to use for training the model. Use nvidia-smi to see available GPUs
+    gpus: [2] # which GPUs to use for training the model. Use nvidia-smi to see available GPUs
     epochs: 20 # Number of Times To Run the dataset through the model for training
     patience: 2 # Number of epochs without improvement after which training will be early stopped 
     mode: test #train #test #lr_find
@@ -51,7 +51,4 @@ Optimizer:
 Loss:
     loss : CrossEntropyLoss #Currently only one loss hardcoded. Will Add this option Later
 
-Feature_Extraction:
-    save_address:
-    model_weights_path:
-    patches_csv_path:
+

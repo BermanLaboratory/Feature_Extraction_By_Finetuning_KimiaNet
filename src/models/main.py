@@ -114,7 +114,6 @@ def main(cfg):
 if __name__ == '__main__':
 
 	args = parse()
-	# config_file_path = '/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/config/bermanlab.yaml'
 	config_file_path = args.config
 	cfg = read_yaml(config_file_path)
 

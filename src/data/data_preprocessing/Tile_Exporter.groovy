@@ -1,5 +1,5 @@
 /**
- Final Script For Creating Tiles of Whole Slide Images Using Qupath through command line
+ Final Script For Creating Tiles of Whole Slide Images Using Qupath 
  */
 
 def imageData = getCurrentImageData()

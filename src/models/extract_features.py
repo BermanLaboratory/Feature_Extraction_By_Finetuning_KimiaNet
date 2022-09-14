@@ -80,11 +80,10 @@ def extract_features(model):
 
 if __name__ == '__main__':
 
-    # config_file_path = '/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/src/config/bermanlab.yaml'
+    
    
     save_address = config['save_add']
     checkpoint_path = config['model_weights']
-    # save_address = '/mnt/largedrive0/katariap/feature_extraction/data/Dataset/kimianet_features/'
     config_file_path = config['config']
     selected_csv = config['selected']
 
@@ -101,7 +100,6 @@ if __name__ == '__main__':
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=16, num_workers = 40)
 
 
-    # checkpoint_path = '/mnt/largedrive0/katariap/feature_extraction/data/Code/kimianet_feature_extractor/models/feature_extraction-epoch=08-val_loss=0.8935.ckpt'
     model = model_interface.load_from_checkpoint(checkpoint_path,kimianet_weights = cfg.Model.pretrained_weights,num_classes = cfg.Model.n_classes,learning_rate = cfg.Optimizer.lr)
 
     model = model.to(device)

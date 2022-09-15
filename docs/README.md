@@ -279,7 +279,7 @@ Loss:
 
 
 ```shell
-python main.py --config CONFIG_FILE_PATH 
+python main.py CONFIG_FILE_PATH 
 
 ```
 Arguments:
@@ -307,7 +307,7 @@ export PYTHONPATH=$PYTHONPATH:PATH_TO_SRC_FOLDER
 
 ## Post Training Pipeline:
 
-<img src="/docs/Post_Training_Pipeline.png"  height = '300px' width = '500px' align="center" />
+<img src="/docs/Post_Training_Pipeline.png"  height = '400px' width = '450px' align="center" />
 
 
 ## Feature Extraction
